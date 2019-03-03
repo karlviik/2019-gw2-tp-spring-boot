@@ -1,0 +1,105 @@
+https://wiki.guildwars2.com/wiki/API:2/commerce/prices
+
+If each item gets own table, then ID would be table name.
+time : UTC + 0 time, is time of polling
+buys : int qty, buy order quantity, taken from json
+sells : int qty, json
+buy : int price, json
+sell : int price, json
+craftbuy : int price, calculated w buys, round up
+craftsell : int price, calculated w sells, round up
+openbuy : int price, calculated w selling directly, round down
+opensell : int price, calculated w selling on order, round down
+mfbuy : int price, buy order components, round
+mfsell : int price, sell order components, round
+salvage1id : int id
+salvage1buy : int price
+salvage1sell : int price
+salvage2id : int id
+salvage2buy : int price
+salvage2sell : int price
+
+
+https://wiki.guildwars2.com/wiki/API:2/recipes
+
+id : int id ("id")
+exptime : time, when recipe got overwritten by another one
+type : str type ("type")
+discipline : str discipline (disciplines, maybe just save as comma sep string)
+min rating : int min rating ("min rating")
+flag : bool (if learned from item, put true, othewise false)
+chatlink : str link ("chat_link")
+output id : int id ("output_item_id")
+output count : int count ("output_item_count")
+ingredient1 : int id ("item_id")
+count1 : int count ("count")
+ingredient2 : int id ("item_id")
+count2 : int count ("count")
+ingredient3 : int id ("item_id")
+count3 : int count ("count")
+ingredient4 : int id ("item_id")
+count4 : int count ("count")
+
+
+https://wiki.guildwars2.com/wiki/API:2/items
+
+id
+chatlink
+name
+iconimgid??
+type
+rarity
+level
+vendorvalue
+flagbool: true if acc bound/soulbound
+    NoSell: vendor value is null
+    SoulBindOnAquire or AccoundBound makes it true
+
+armordetails====
+type2
+type3 (weight class or clothing)
+suffixitemid
+secondarysuffixitemid
+infusionslotitemid
+infusionslot2itemid
+
+backitem========
+infusionslot1itemid
+infusionslot2itemid
+infusionslot3itemid
+suffixitemid
+secondarysuffixitemid
+
+consumable===========
+type2
+
+container============
+type2
+
+gathertools==========
+type2
+
+gizmo================
+type2
+
+salvagekits==========
+type2
+
+trinket==============
+type2
+infusion1itemid
+infusion2itemid
+infusion3itemid
+suffixitemid
+secondarysuffixitemid
+
+upgradecomponent=====
+type2
+
+weapon===============
+type2
+infusion1itemid
+infusion2itemid
+infusion3itemid
+suffixitemid
+secondarysuffixitemid
