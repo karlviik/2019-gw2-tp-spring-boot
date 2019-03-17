@@ -3,7 +3,6 @@ package gwapi.entity;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.Table;
 import java.util.Date;
 
