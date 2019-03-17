@@ -4,5 +4,5 @@ import gwapi.entity.Item;
 
 import java.util.ArrayList;
 
-public class ItemsApiResponse extends ArrayList<Item> {
+public class ItemsPageApiResponse extends ArrayList<Item> {
 }

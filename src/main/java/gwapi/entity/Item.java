@@ -1,9 +1,7 @@
 package gwapi.entity;
 
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -12,6 +10,7 @@ import javax.persistence.Table;
 @Table(name = "items")
 @JsonDeserialize(using = ItemDeserializer.class)
 public class Item {
+
     @Id
     private Integer id;
     private String name;
