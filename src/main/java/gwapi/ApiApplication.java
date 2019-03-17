@@ -1,5 +1,6 @@
 package gwapi;
 
+import gwapi.dao.JdbcDao;
 import gwapi.web.ApiPullController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
