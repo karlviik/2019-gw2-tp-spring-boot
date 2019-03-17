@@ -25,9 +25,9 @@ public class JdbcDao extends JdbcDaoSupport {
         dbt = getJdbcTemplate();
     }
 
-    public void createTable() {
+    public void createTableIfNotExist() {
         System.out.println(getJdbcTemplate() == null);
-        getJdbcTemplate().update("CREATE TABLE iaaaatem (id int, name varchar);");
+        getJdbcTemplate().update("CREATE TABLE ? (?, ?);");
     }
 
     public void create(String sql, Object... args) {

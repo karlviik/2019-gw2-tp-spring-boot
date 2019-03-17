@@ -3,6 +3,7 @@ package gwapi.entity;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -11,7 +12,7 @@ import java.util.Date;
 @JsonDeserialize(using = PriceDeserializer.class)
 public class Price {
 
-    private Item item;
+    @Id // temporary
     private int id;
     private Date time;
     private Integer buyPrice;
