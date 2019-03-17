@@ -2,5 +2,5 @@ package gwapi.web.apiresponse;
 
 import java.util.ArrayList;
 
-public class ItemsIdsApiResponse extends ArrayList<Integer> {
+public class AllIdsApiResponse extends ArrayList<Integer> {
 }

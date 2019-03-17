@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Time;
+import java.util.Date;
 
 @Entity
 @Table(name = "recipes")
@@ -16,7 +17,7 @@ public class Recipe {
 
     @Id
     private Integer recipeId;
-    private Time overwriteTime;
+    private Date overwriteTime;
     private RecipeType type;
     private Integer minRating;
     private boolean learnedFromItem;
