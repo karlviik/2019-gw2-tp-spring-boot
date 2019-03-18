@@ -68,7 +68,7 @@ public class RecipesPageApiResponse extends ArrayList<RecipeResponse> {
             return ingredients;
         }
 
-        private static class Ingredient {
+        public static class Ingredient {
 
             @JsonProperty("item_id")
             private int inId;

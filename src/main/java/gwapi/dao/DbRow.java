@@ -23,6 +23,10 @@ public class DbRow extends LinkedCaseInsensitiveMap<Object> {
         return getValue(columnLabel);
     }
 
+    public Integer getInteger(String columnLabel) {
+        return getValue(columnLabel);
+    }
+
     public String getString(String columnLabel) {
         return getValue(columnLabel);
     }
