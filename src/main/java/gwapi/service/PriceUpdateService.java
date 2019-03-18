@@ -1,5 +1,6 @@
 package gwapi.service;
 
+import gwapi.dao.PricesDao;
 import gwapi.entity.Price;
 import gwapi.web.apiresponse.AllIdsApiResponse;
 import gwapi.web.apiresponse.PricesPageApiResponse;
@@ -19,6 +20,9 @@ public class PriceUpdateService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private PricesDao pricesDao;
 
     public void getPricePoints() {
         LocalDateTime time = LocalDateTime.now(UTC);
@@ -40,7 +44,7 @@ public class PriceUpdateService {
             result.getBody()
                     .stream()
                     .map(priceResponse -> map(priceResponse, time))
-                    .forEach(System.out::println);
+                    .forEach(price -> pricesDao.create(price));
         }
 
 

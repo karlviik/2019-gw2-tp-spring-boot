@@ -27,7 +27,7 @@ CREATE TABLE recipe_disciplines(
 
 CREATE TABLE recipes(
     id INTEGER,
-    overwriteTime TIMESTAMP with time zone,
+    overwriteTime TIMESTAMP,
     type TEXT,
     minRating SMALLINT,
     learnedFromItem BOOLEAN,
@@ -46,7 +46,7 @@ CREATE TABLE recipes(
 
 CREATE TABLE prices(
     id INTEGER,
-    time TIMESTAMP with time zone,
+    time TIMESTAMP,
     buyPrice INTEGER,
     buyQuantity INTEGER,
     sellPrice INTEGER,

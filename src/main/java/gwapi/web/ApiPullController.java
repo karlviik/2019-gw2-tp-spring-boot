@@ -1,15 +1,11 @@
 package gwapi.web;
 
-import gwapi.dao.JdbcDao;
 import gwapi.entity.*;
 
 import gwapi.service.PriceUpdateService;
-import gwapi.web.apiresponse.RecipesPageApiResponse;
 import gwapi.web.response.HelloResponse;
 import gwapi.web.apiresponse.ItemsPageApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -19,9 +15,6 @@ public class ApiPullController {
 
     @Autowired
     private RestTemplate restTemplate;
-
-    @Autowired
-    private JdbcDao dbd;
 
     @Autowired
     private PriceUpdateService priceUpdateService;
