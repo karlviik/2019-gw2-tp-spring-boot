@@ -10,5 +10,5 @@ public enum RecipeDiscipline {
     LEATHERWORKER,
     TAILOR,
     WEAPONSMITH,
-    SCRIBE,
+    SCRIBE
 }

@@ -1,8 +1,88 @@
 package gwapi.web.apiresponse;
 
-import gwapi.entity.Recipe;
-
 import java.util.ArrayList;
 
-public class RecipesPageApiResponse extends ArrayList<Recipe> {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import gwapi.web.apiresponse.RecipesPageApiResponse.RecipeResponse;
+
+public class RecipesPageApiResponse extends ArrayList<RecipeResponse> {
+
+    public static class RecipeResponse {
+
+        private int id;
+
+        private String type;
+
+        @JsonProperty("chat_link")
+        private String chatLink;
+
+        @JsonProperty("min_rating")
+        private int minRating;
+
+        @JsonProperty("output_item_id")
+        private int outId;
+
+        @JsonProperty("output_item_count")
+        private int outCount;
+
+        private ArrayList<String> disciplines;
+
+        private ArrayList<String> flags;
+
+        private ArrayList<Ingredient> ingredients;
+
+        public int getId() {
+            return id;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getChatLink() {
+            return chatLink;
+        }
+
+        public int getMinRating() {
+            return minRating;
+        }
+
+        public int getOutId() {
+            return outId;
+        }
+
+        public int getOutCount() {
+            return outCount;
+        }
+
+        public ArrayList<String> getDisciplines() {
+            return disciplines;
+        }
+
+        public ArrayList<String> getFlags() {
+            return flags;
+        }
+
+        public ArrayList<Ingredient> getIngredients() {
+            return ingredients;
+        }
+
+        private static class Ingredient {
+
+            @JsonProperty("item_id")
+            private int inId;
+
+            @JsonProperty("count")
+            private int inCount;
+
+            public int getInId() {
+                return inId;
+            }
+
+            public int getInCount() {
+                return inCount;
+            }
+        }
+    }
 }

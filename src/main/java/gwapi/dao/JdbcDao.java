@@ -1,48 +1,71 @@
 package gwapi.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-@Component
-@Primary
 public class JdbcDao extends JdbcDaoSupport {
-    // should be Java Database Connectivity Data Access Object
 
     @Autowired
-    DataSource dataSource;
+    private JdbcTemplate jdbcTemplate;
 
-    JdbcTemplate dbt;
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    @PostConstruct
-    private void initialize(){
-        setDataSource(dataSource);
-        dbt = getJdbcTemplate();
+    protected int update(String sql, Object... arguments) {
+        return jdbcTemplate.update(sql, arguments);
     }
 
-    public void createTableIfNotExist() {
-        System.out.println(getJdbcTemplate() == null);
-        getJdbcTemplate().update("CREATE TABLE ? (?, ?);");
+    protected int update(String sql, Map<String, ?> parameters) {
+        return namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(parameters));
     }
 
-    public void create(String sql, Object... args) {
-        dbt.update(sql, args);
+    protected List<DbRow> list(String sql, Object... arguments) {
+        return jdbcTemplate.query(sql, new DbRowMapper(), arguments);
     }
 
-    public int save(String sql, Object... args) {
-        return 0;
+    protected List<DbRow> list(String sql, Map<String, ?> parameters) {
+        return namedParameterJdbcTemplate.query(sql, parameters, new DbRowMapper());
     }
 
-    public void delete(String sql, Object... args) {
-
+    protected <T> List<T> list(String sql, RowMapper<T> mapper, Map<String, ?> parameters) {
+        return namedParameterJdbcTemplate.query(sql, parameters, mapper);
     }
 
-    public void update(String sql, Object... args) {
+    protected <T> List<T> list(String sql, RowMapper<T> mapper, Object... arguments) {
+        return jdbcTemplate.query(sql, arguments, mapper);
+    }
 
+    protected DbRow one(String sql, Map<String, ?> parameters) {
+        return namedParameterJdbcTemplate.queryForObject(sql, parameters, new DbRowMapper());
+    }
+
+    protected <T> T one(String sql, RowMapper<T> mapper, Object... arguments) {
+        return jdbcTemplate.queryForObject(sql, mapper, arguments);
+    }
+
+    protected <T> Optional<T> tryOne(String sql, RowMapper<T> mapper, Object... arguments) {
+        try {
+            return Optional.ofNullable(one(sql, mapper, arguments));
+        }
+        catch (IncorrectResultSizeDataAccessException ignore) {
+            return Optional.empty();
+        }
+    }
+
+    protected <T> Optional<T> trySingleResult(List<T> list) {
+        if (list.size() == 1) {
+            return Optional.of(list.get(0));
+        }
+
+        return Optional.empty();
     }
 }

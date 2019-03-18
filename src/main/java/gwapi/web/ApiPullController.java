@@ -1,9 +1,8 @@
 package gwapi.web;
 
 import gwapi.dao.JdbcDao;
-import gwapi.entity.Item;
-import gwapi.entity.Recipe;
-import gwapi.repository.ItemRepository;
+import gwapi.entity.*;
+//import gwapi.repository.ItemRepository;
 import gwapi.web.apiresponse.RecipesPageApiResponse;
 import gwapi.web.response.HelloResponse;
 import gwapi.web.apiresponse.ItemsPageApiResponse;
@@ -21,9 +20,6 @@ public class ApiPullController {
     private RestTemplate restTemplate;
 
     @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
     private JdbcDao dbd;
 
     @GetMapping("/hello")
@@ -33,21 +29,48 @@ public class ApiPullController {
 
     @GetMapping("/hello2")
     public void fetchItems() {
-//        ResponseEntity<ItemsPageApiResponse> response = restTemplate.exchange("https://api.guildwars2.com/v2/items?page_size=200&page=150", HttpMethod.GET, null, ItemsPageApiResponse.class);
+        ResponseEntity<ItemsPageApiResponse> response = restTemplate.exchange("https://api.guildwars2.com/v2/items?page_size=200&page=150", HttpMethod.GET, null, ItemsPageApiResponse.class);
 
-//        for (Item item : response.getBody()) {
-//            System.out.println(item);
-//            itemRepository.save(item);
-//            dbd.createTable();
-//        }
+        for (ItemsPageApiResponse.ItemResponse item : response.getBody()) {
+            System.out.println(map(item));
+        }
 
-        ResponseEntity<RecipesPageApiResponse> response = restTemplate.exchange("https://api.guildwars2.com/v2/recipes?page_size=200&page=20", HttpMethod.GET, null, RecipesPageApiResponse.class);
+        ResponseEntity<RecipesPageApiResponse> response2 = restTemplate.exchange("https://api.guildwars2.com/v2/recipes?page_size=200&page=20", HttpMethod.GET, null, RecipesPageApiResponse.class);
 
-        for (Recipe recipe : response.getBody()) {
-            System.out.println(recipe);
+        for (RecipesPageApiResponse.RecipeResponse ef : response2.getBody()) {
+            System.out.println(ef);
 //            dbd.createTable();
         }
 
+    }
+    private Item map(ItemsPageApiResponse.ItemResponse response) {
+        String[] regexSplit = response.getIcon().split("/");
+        Integer iconId = Integer.parseInt(regexSplit[regexSplit.length - 1].split("\\.")[0]);
+
+        boolean isBound = false;
+        for (String flag : response.getFlags()) {
+            if (flag.equals("AccountBound") || flag.equals("SoulBindOnAcquire")) {
+                isBound = true;
+                break;
+            }
+        }
+        return new Item(
+                response.getId(),
+                response.getName(),
+                response.getChatLink(),
+                iconId,
+                ItemRarity.valueOf(response.getRarity().toUpperCase()),
+                response.getLevel(),
+                isBound,
+                response.getVendorValue(),
+                ItemType.valueOf(response.getType().toUpperCase()),
+                response.getDetail() != null && response.getDetail().getType() != null ? ItemSubType.valueOf(response.getDetail().getType().toUpperCase()) : null,
+                response.getDetail() != null && response.getDetail().getWeightClass() != null ? ItemSubSubType.valueOf(response.getDetail().getWeightClass().toUpperCase()) : null,
+                response.getDetail() != null && response.getDetail().getSubItem() != null ? response.getDetail().getSubItem() : null,
+                response.getDetail() != null && response.getDetail().getSubItem2() != null ? response.getDetail().getSubItem2() : null,
+                response.getDetail() != null && response.getDetail().getInfusions() != null && response.getDetail().getInfusions().size() > 0 && response.getDetail().getInfusions().get(0).getId() != null ? response.getDetail().getInfusions().get(0).getId() : null,
+                response.getDetail() != null && response.getDetail().getInfusions() != null && response.getDetail().getInfusions().size() > 1 && response.getDetail().getInfusions().get(1).getId() != null ? response.getDetail().getInfusions().get(1).getId() : null,
+                response.getDetail() != null && response.getDetail().getInfusions() != null && response.getDetail().getInfusions().size() > 2 && response.getDetail().getInfusions().get(2).getId() != null ? response.getDetail().getInfusions().get(2).getId() : null);
     }
 
 }
