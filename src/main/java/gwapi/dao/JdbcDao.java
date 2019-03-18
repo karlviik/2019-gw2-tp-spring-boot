@@ -6,13 +6,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class JdbcDao extends JdbcDaoSupport {
+public abstract class JdbcDao {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

@@ -2,7 +2,8 @@ package gwapi.web;
 
 import gwapi.dao.JdbcDao;
 import gwapi.entity.*;
-//import gwapi.repository.ItemRepository;
+
+import gwapi.service.PriceUpdateService;
 import gwapi.web.apiresponse.RecipesPageApiResponse;
 import gwapi.web.response.HelloResponse;
 import gwapi.web.apiresponse.ItemsPageApiResponse;
@@ -22,6 +23,9 @@ public class ApiPullController {
     @Autowired
     private JdbcDao dbd;
 
+    @Autowired
+    private PriceUpdateService priceUpdateService;
+
     @GetMapping("/hello")
     public Object hello() {
         return new HelloResponse("hello");
@@ -29,18 +33,19 @@ public class ApiPullController {
 
     @GetMapping("/hello2")
     public void fetchItems() {
-        ResponseEntity<ItemsPageApiResponse> response = restTemplate.exchange("https://api.guildwars2.com/v2/items?page_size=200&page=150", HttpMethod.GET, null, ItemsPageApiResponse.class);
-
-        for (ItemsPageApiResponse.ItemResponse item : response.getBody()) {
-            System.out.println(map(item));
-        }
-
-        ResponseEntity<RecipesPageApiResponse> response2 = restTemplate.exchange("https://api.guildwars2.com/v2/recipes?page_size=200&page=20", HttpMethod.GET, null, RecipesPageApiResponse.class);
-
-        for (RecipesPageApiResponse.RecipeResponse ef : response2.getBody()) {
-            System.out.println(ef);
-//            dbd.createTable();
-        }
+        priceUpdateService.getPricePoints();
+//        ResponseEntity<ItemsPageApiResponse> response = restTemplate.exchange("https://api.guildwars2.com/v2/items?page_size=200&page=150", HttpMethod.GET, null, ItemsPageApiResponse.class);
+//
+//        for (ItemsPageApiResponse.ItemResponse item : response.getBody()) {
+//            System.out.println(map(item));
+//        }
+//
+//        ResponseEntity<RecipesPageApiResponse> response2 = restTemplate.exchange("https://api.guildwars2.com/v2/recipes?page_size=200&page=20", HttpMethod.GET, null, RecipesPageApiResponse.class);
+//
+//        for (RecipesPageApiResponse.RecipeResponse ef : response2.getBody()) {
+//            System.out.println(ef);
+////            dbd.createTable();
+//        }
 
     }
     private Item map(ItemsPageApiResponse.ItemResponse response) {
