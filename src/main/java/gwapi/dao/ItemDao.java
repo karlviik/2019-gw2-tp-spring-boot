@@ -30,9 +30,4 @@ public class ItemDao extends JdbcDao {
                 .collect(Collectors.toList());
     }
 
-//    public List<String> search() {
-//        return list("SELECT name FROM items").stream()
-//                .map(rs -> rs.getString("name"))
-//                .collect(Collectors.toList());
-//    }
 }

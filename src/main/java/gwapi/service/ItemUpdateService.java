@@ -1,11 +1,9 @@
 package gwapi.service;
 
 import gwapi.dao.ItemDao;
-import gwapi.dao.PriceDao;
 import gwapi.entity.*;
 import gwapi.web.apiresponse.IdListApiResponse;
 import gwapi.web.apiresponse.ItemPageApiResponse;
-import gwapi.web.apiresponse.PricePageApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +11,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.lang.Math;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.time.ZoneOffset.UTC;
 
 /**
  * Should have 2 methods:

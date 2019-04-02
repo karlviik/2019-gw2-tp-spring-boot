@@ -75,12 +75,6 @@ public class RecipeDao extends JdbcDao {
         return recipes;
     }
 
-//    public List<Recipe> searchOutIdCurrentOnlyComponents(int outId) {
-//        return list("SELECT out_id, out_count, in_id_1, in_count_1, in_id_2, in_count_2, in_id_3, in_count_3, in_id_4, in_count_4 FROM prices WHERE out_id=? AND overwrite_time IS NULL", outId).stream()
-//                .map(rs -> map(rs))
-//                .collect(Collectors.toList());
-//    }
-
     private RecipeComponent mapComponent(DbRow row) {
         return new RecipeComponent(
                 row.getInteger("component_item_id"),
