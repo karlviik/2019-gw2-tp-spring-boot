@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import gwapi.web.apiresponse.RecipesPageApiResponse.RecipeResponse;
+import gwapi.web.apiresponse.RecipePageApiResponse.RecipeResponse;
 
-public class RecipesPageApiResponse extends ArrayList<RecipeResponse> {
+// example: https://api.guildwars2.com/v2/recipes?page_size=200&page=60
+public class RecipePageApiResponse extends ArrayList<RecipeResponse> {
 
     public static class RecipeResponse {
 

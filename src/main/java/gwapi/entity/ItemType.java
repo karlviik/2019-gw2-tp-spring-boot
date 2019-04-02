@@ -1,7 +1,5 @@
 package gwapi.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * Includes all types item can have.
  * NONE is used for when type is empty.

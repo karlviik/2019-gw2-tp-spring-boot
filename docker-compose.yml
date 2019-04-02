@@ -1,0 +1,11 @@
+postgres:
+  container_name:
+    gw2api
+  image:
+    postgres:latest
+  ports:
+    - "5432:5432"
+  environment:
+    POSTGRES_DB: gw2api
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: docker

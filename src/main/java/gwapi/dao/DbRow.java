@@ -1,6 +1,7 @@
 package gwapi.dao;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.jdbc.core.ColumnMapRowMapper;
@@ -32,6 +33,10 @@ public class DbRow extends LinkedCaseInsensitiveMap<Object> {
     }
 
     public Boolean getBoolean(String columnLabel) {
+        return getValue(columnLabel);
+    }
+
+    public LocalDateTime getLocalDateTime(String columnLabel) {
         return getValue(columnLabel);
     }
 

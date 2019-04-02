@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
-import gwapi.web.apiresponse.PricesPageApiResponse.PriceResponse;
+import gwapi.web.apiresponse.PricePageApiResponse.PriceResponse;
 
-public class PricesPageApiResponse extends ArrayList<PriceResponse> {
+// example: https://api.guildwars2.com/v2/commerce/prices?page_size=200&page=125
+public class PricePageApiResponse extends ArrayList<PriceResponse> {
 
     public static class PriceResponse {
 

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Item {
 
@@ -19,19 +21,14 @@ public class Item {
     private ItemType type;
     private ItemSubType type2;
     private ItemSubSubType type3;
-    private Integer subItem;
-    private Integer subItem2;
-    private Integer subInfusion;
-    private Integer subInfusion2;
-    private Integer subInfusion3;
+    private List<Integer> itemUpgrades;
+    private List<Integer> itemInfusions;
 
     protected Item() {
 
     }
 
-    public Item(Integer id, String name, String chatLink, Integer iconId, ItemRarity rarity, Integer level,
-                Boolean bound, Integer vendorValue, ItemType type, ItemSubType type2, ItemSubSubType type3,
-                Integer subItem, Integer subItem2, Integer subInfusion, Integer subInfusion2, Integer subInfusion3) {
+    public Item(Integer id, String name, String chatLink, Integer iconId, ItemRarity rarity, Integer level, Boolean bound, Integer vendorValue, ItemType type, ItemSubType type2, ItemSubSubType type3, List<Integer> itemUpgrades, List<Integer> itemInfusions) {
         this.id = id;
         this.name = name;
         this.chatLink = chatLink;
@@ -43,11 +40,8 @@ public class Item {
         this.type = type;
         this.type2 = type2;
         this.type3 = type3;
-        this.subItem = subItem;
-        this.subItem2 = subItem2;
-        this.subInfusion = subInfusion;
-        this.subInfusion2 = subInfusion2;
-        this.subInfusion3 = subInfusion3;
+        this.itemUpgrades = itemUpgrades;
+        this.itemInfusions = itemInfusions;
     }
 
     @Override
@@ -55,11 +49,58 @@ public class Item {
         return String.join(", ",
                 String.valueOf(id),
                 String.valueOf(name),
-                String.valueOf(type),
-                String.valueOf(subItem),
-                String.valueOf(subItem2),
-                String.valueOf(subInfusion),
-                String.valueOf(subInfusion2),
-                String.valueOf(subInfusion3));
+                String.valueOf(type));
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getChatLink() {
+        return chatLink;
+    }
+
+    public Integer getIconId() {
+        return iconId;
+    }
+
+    public ItemRarity getRarity() {
+        return rarity;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public Boolean getBound() {
+        return bound;
+    }
+
+    public Integer getVendorValue() {
+        return vendorValue;
+    }
+
+    public ItemType getType() {
+        return type;
+    }
+
+    public ItemSubType getType2() {
+        return type2;
+    }
+
+    public ItemSubSubType getType3() {
+        return type3;
+    }
+
+    public List<Integer> getItemUpgrades() {
+        return itemUpgrades;
+    }
+
+    public List<Integer> getItemInfusions() {
+        return itemInfusions;
     }
 }

@@ -1,6 +1,9 @@
 package gwapi.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Recipe {
 
@@ -10,63 +13,29 @@ public class Recipe {
     private Integer minRating;
     private boolean learnedFromItem;
     private String chatLink;
-    private Integer outId;
-    private Integer outCount;
-    private Integer inId1;
-    private Integer inCount1;
-    private Integer inId2;
-    private Integer inCount2;
-    private Integer inId3;
-    private Integer inCount3;
-    private Integer inId4;
-    private Integer inCount4;
+    private Integer outItemId;
+    private Integer outItemCount;
+    private List<RecipeDiscipline> disciplines;
+    private List<RecipeComponent> components;
 
 
-    public Recipe(Integer recipeId,
-                  LocalDateTime overwriteTime,
-                  RecipeType type,
-                  Integer minRating,
-                  boolean learnedFromItem,
-                  String chatLink,
-                  Integer outId,
-                  Integer outCount,
-                  Integer inId1,
-                  Integer inCount1,
-                  Integer inId2,
-                  Integer inCount2,
-                  Integer inId3,
-                  Integer inCount3,
-                  Integer inId4,
-                  Integer inCount4) {
+    public Recipe(Integer recipeId, LocalDateTime overwriteTime, RecipeType type, Integer minRating, boolean learnedFromItem, String chatLink, Integer outItemId, Integer outItemCount, List<RecipeDiscipline> disciplines, List<RecipeComponent> components) {
         this.recipeId = recipeId;
         this.overwriteTime = overwriteTime;
         this.type = type;
         this.minRating = minRating;
         this.learnedFromItem = learnedFromItem;
         this.chatLink = chatLink;
-        this.outId = outId;
-        this.outCount = outCount;
-        this.inId1 = inId1;
-        this.inCount1 = inCount1;
-        this.inId2 = inId2;
-        this.inCount2 = inCount2;
-        this.inId3 = inId3;
-        this.inCount3 = inCount3;
-        this.inId4 = inId4;
-        this.inCount4 = inCount4;
+        this.outItemId = outItemId;
+        this.outItemCount = outItemCount;
+        this.disciplines = disciplines;
+        this.components = components;
     }
 
-    public Recipe(Integer outId, Integer outCount, Integer inId1, Integer inCount1, Integer inId2, Integer inCount2, Integer inId3, Integer inCount3, Integer inId4, Integer inCount4) {
-        this.outId = outId;
-        this.outCount = outCount;
-        this.inId1 = inId1;
-        this.inCount1 = inCount1;
-        this.inId2 = inId2;
-        this.inCount2 = inCount2;
-        this.inId3 = inId3;
-        this.inCount3 = inCount3;
-        this.inId4 = inId4;
-        this.inCount4 = inCount4;
+    public Recipe(Integer outItemId, Integer outItemCount, List<RecipeComponent> components) {
+        this.outItemId = outItemId;
+        this.outItemCount = outItemCount;
+        this.components = components;
     }
 
     @Override
@@ -77,17 +46,7 @@ public class Recipe {
                 type.toString(),
                 minRating.toString(),
                 String.valueOf(learnedFromItem),
-                String.valueOf(chatLink),
-                String.valueOf(outId),
-                String.valueOf(outCount),
-                String.valueOf(inId1),
-                String.valueOf(inCount1),
-                String.valueOf(inId2),
-                String.valueOf(inCount2),
-                String.valueOf(inId3),
-                String.valueOf(inCount3),
-                String.valueOf(inId4),
-                String.valueOf(inCount4));
+                String.valueOf(chatLink));
     }
 
     public Integer getRecipeId() {
@@ -114,43 +73,50 @@ public class Recipe {
         return chatLink;
     }
 
-    public Integer getOutId() {
-        return outId;
+    public Integer getOutItemId() {
+        return outItemId;
     }
 
-    public Integer getOutCount() {
-        return outCount;
+    public Integer getOutItemCount() {
+        return outItemCount;
     }
 
-    public Integer getInId1() {
-        return inId1;
+    public List<RecipeDiscipline> getDisciplines() {
+        return disciplines;
     }
 
-    public Integer getInCount1() {
-        return inCount1;
+    public List<RecipeComponent> getComponents() {
+        return components;
     }
 
-    public Integer getInId2() {
-        return inId2;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Recipe)) return false;
+        Recipe recipe = (Recipe) o;
+        for (RecipeComponent component : components) {
+            boolean hasFoundPair = false;
+            for (RecipeComponent compareComponent : recipe.components) {
+                if (component.getId() == compareComponent.getId() && component.getCount() == compareComponent.getCount()) {
+                    hasFoundPair = true;
+                    break;
+                }
+            }
+            if (!hasFoundPair) {
+                return false;
+            }
+        }
+        return learnedFromItem == recipe.learnedFromItem &&
+                recipeId.equals(recipe.recipeId) &&
+                type == recipe.type &&
+                minRating.equals(recipe.minRating) &&
+                chatLink.equals(recipe.chatLink) &&
+                outItemId.equals(recipe.outItemId) &&
+                outItemCount.equals(recipe.outItemCount);
     }
 
-    public Integer getInCount2() {
-        return inCount2;
-    }
-
-    public Integer getInId3() {
-        return inId3;
-    }
-
-    public Integer getInCount3() {
-        return inCount3;
-    }
-
-    public Integer getInId4() {
-        return inId4;
-    }
-
-    public Integer getInCount4() {
-        return inCount4;
+    @Override
+    public int hashCode() {
+        return Objects.hash(recipeId, type, minRating, learnedFromItem, chatLink, outItemId, outItemCount, components);
     }
 }

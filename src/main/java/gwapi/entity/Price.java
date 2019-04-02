@@ -10,18 +10,12 @@ public class Price {
     private Integer buyQuantity;
     private Integer sellPrice;
     private Integer sellQuantity;
-    private Integer buyCraft;
-    private Integer sellCraft;
-    private Integer buyOpen;
-    private Integer sellOpen;
-    private Integer buyMysticForge;
-    private Integer sellMysticForge;
-    private Integer salvage1Id;
-    private Integer salvage1Buy;
-    private Integer salvage1Sell;
-    private Integer salvage2Id;
-    private Integer salvage2Buy;
-    private Integer salvage2Sell;
+    private Integer craftBuyPrice;
+    private Integer craftSellPrice;
+    private Integer openBuyPrice;
+    private Integer openSellPrice;
+    private Integer mysticForgeBuyPrice;
+    private Integer mysticForgeSellPrice;
 
 
     public Price(int id, LocalDateTime time, Integer buyPrice, Integer buyQuantity, Integer sellPrice, Integer sellQuantity) {
@@ -31,6 +25,14 @@ public class Price {
         this.buyQuantity = buyQuantity;
         this.sellPrice = sellPrice;
         this.sellQuantity = sellQuantity;
+    }
+
+    public Price(int id, Integer buyPrice, Integer sellPrice, Integer craftBuyPrice, Integer craftSellPrice) {
+        this.id = id;
+        this.buyPrice = buyPrice;
+        this.sellPrice = sellPrice;
+        this.craftBuyPrice = craftBuyPrice;
+        this.craftSellPrice = craftSellPrice;
     }
 
     @Override
@@ -65,5 +67,13 @@ public class Price {
 
     public Integer getSellQuantity() {
         return sellQuantity;
+    }
+
+    public Integer getCraftBuyPrice() {
+        return craftBuyPrice;
+    }
+
+    public Integer getCraftSellPrice() {
+        return craftSellPrice;
     }
 }

@@ -3,9 +3,10 @@ package gwapi.web.apiresponse;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gwapi.web.apiresponse.ItemsPageApiResponse.ItemResponse;
+import gwapi.web.apiresponse.ItemPageApiResponse.ItemResponse;
 
-public class ItemsPageApiResponse extends ArrayList<ItemResponse> {
+// example: https://api.guildwars2.com/v2/items?page_size=200&page=275
+public class ItemPageApiResponse extends ArrayList<ItemResponse> {
 
     public static class ItemResponse {
 
