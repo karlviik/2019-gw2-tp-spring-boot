@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -63,12 +64,15 @@ public class RecipeDao extends JdbcDao {
 
     public List<Recipe> searchCurrentByOutId(int outId) {
         List<DbRow> listOfResults = list("SELECT id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count FROM recipe WHERE out_item_id=? AND updated_at IS NULL", outId);
+        ArrayList<Recipe> recipes = new ArrayList<>();
         for (DbRow row : listOfResults) {
-            row.get
+            Integer recipeId = row.getInteger("id");
+            List<RecipeComponent> components = list("SELECT component_item_id, component_item_count FROM recipe_component WHERE recipe_id=? AND updated_at IS NULL", recipeId).stream()
+                    .map(result -> mapComponent(result))
+                    .collect(Collectors.toList());
+            recipes.add(mapRecipeWithComponents(row, components));
         }
-
-                .map(result -> mapRecipeWithComponents(result, components))
-                .collect(Collectors.toList());
+        return recipes;
     }
 
 //    public List<Recipe> searchOutIdCurrentOnlyComponents(int outId) {

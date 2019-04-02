@@ -34,7 +34,8 @@ public class ApiPullController {
 
     @GetMapping("/hello2")
     public void fetchItems() {
-        itemUpdateService.updateAllItems();
+//        recipeUpdateService.updateAllRecipes();
+        priceUpdateService.updatePrices();
 //        priceUpdateService.getPricePoints();
 
 //        ResponseEntity<ItemPageApiResponse> response = restTemplate.exchange("https://api.guildwars2.com/v2/items?page_size=200&page=150", HttpMethod.GET, null, ItemPageApiResponse.class);

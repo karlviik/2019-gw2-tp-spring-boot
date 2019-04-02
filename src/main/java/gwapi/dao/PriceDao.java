@@ -17,7 +17,7 @@ public class PriceDao extends JdbcDao {
     }
 
     public void addCraftData(Integer itemId, LocalDateTime time, Integer craftBuy, Integer craftSell) {
-        update("INSERT INTO price(item_id, created_at, craft_buy_price, craft_sell_price) VALUES(?, ?, ?, ?) ON CONFLICT (item_id, created_at) DO UPDATE craft_buy_price=?, craft_sell_price=?", itemId, Timestamp.valueOf(time), craftBuy, craftSell, craftBuy, craftSell);
+        update("INSERT INTO price(item_id, created_at, craft_buy_price, craft_sell_price) VALUES(?, ?, ?, ?) ON CONFLICT (item_id, created_at) DO UPDATE SET craft_buy_price=?, craft_sell_price=?", itemId, Timestamp.valueOf(time), craftBuy, craftSell, craftBuy, craftSell);
     }
 
     public LinkedList<Integer> getCraftData(Integer itemId, LocalDateTime time) {
