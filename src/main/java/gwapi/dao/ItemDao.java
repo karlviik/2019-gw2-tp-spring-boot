@@ -41,6 +41,6 @@ public class ItemDao extends JdbcDao {
     return list("SELECT id FROM item").stream()
         .map(result -> result.getInteger("id"))
         .collect(Collectors.toList());
-
+  }
 
 }

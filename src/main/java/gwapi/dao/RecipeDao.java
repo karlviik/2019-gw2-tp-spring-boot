@@ -19,7 +19,10 @@ public class RecipeDao extends JdbcDao {
 
   // used to create new listing for a recipe that most definitely does not exist yet
   public void createNew(Recipe recipe) {
-    update("INSERT INTO recipe(id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", recipe.getRecipeId(), recipe.getOverwriteTime(), Objects.toString(recipe.getType()), recipe.getMinRating(), recipe.isLearnedFromItem(), recipe.getChatLink(), recipe.getOutItemId(), recipe.getOutItemCount());
+    update(
+        "INSERT INTO recipe(id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count, calculation_level) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)",
+        recipe.getRecipeId(), recipe.getOverwriteTime(), Objects.toString(recipe.getType()), recipe.getMinRating(), recipe.isLearnedFromItem(), recipe.getChatLink(), recipe.getOutItemId(), recipe.getOutItemCount());
     for (RecipeDiscipline discipline : recipe.getDisciplines()) {
       update("INSERT INTO recipe_discipline(recipe_id, discipline) VALUES (?, ?) ON CONFLICT DO NOTHING", recipe.getRecipeId(), Objects.toString(discipline));
     }
@@ -38,7 +41,9 @@ public class RecipeDao extends JdbcDao {
       Integer outItemId,
       Integer outItemCount
   ) {
-    update("INSERT INTO recipe(id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", id, updatedAt, type, minRating, learnedFromItem, chatLink, outItemId, outItemCount);
+    update(
+        "INSERT INTO recipe(id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count, calculation_level) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)", id, updatedAt, type, minRating, learnedFromItem, chatLink, outItemId, outItemCount);
   }
 
   public void addDisciplineOrNothing(Integer id, String discipline) {
@@ -100,6 +105,21 @@ public class RecipeDao extends JdbcDao {
       recipes.add(mapRecipeWithComponents(row, components));
     }
     return recipes;
+  }
+
+
+  public void resetCalculationLevel() {
+    update("UPDATE recipe SET calculation_order = 1");
+  }
+
+  public boolean updateCalculationLevel(int level) {
+    return update("UPDATE recipe " +
+        "SET level = ? " +
+        "WHERE id IN (" +
+        "  SELECT rc.recipe_id " +
+        "  FROM recipe r " +
+        "  JOIN recipe_component rc ON r.out_item_id = rc.component_item_id " +
+        "  WHERE r.level = ?)", level + 1, level) > 0;
   }
 
   public HashSet<Integer> getAllOutIds() {

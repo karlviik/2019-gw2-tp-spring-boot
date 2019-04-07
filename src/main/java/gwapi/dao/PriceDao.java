@@ -1,6 +1,7 @@
 package gwapi.dao;
 
 import gwapi.entity.Price;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -57,5 +58,4 @@ public class PriceDao extends JdbcDao {
         row.getInteger("craft_sell_price")
     );
   }
-
 }

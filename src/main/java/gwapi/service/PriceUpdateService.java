@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.Math;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -41,7 +40,7 @@ public class PriceUpdateService {
   public void updatePrices() {
     LocalDateTime time = LocalDateTime.now(UTC);
     getTradePostPricePoints(time);
-    getCraftPricePoints(time);
+//    getCraftPricePoints(time);
   }
 
   private void getCraftPricePoints(LocalDateTime time) {
@@ -175,6 +174,16 @@ public class PriceUpdateService {
           .forEach(this::addCurrentTradePostPriceToDatabase);
     }
 
+  }
+
+  public void updateRecipeCalculationOrder() {
+    recipeDao.resetCalculationLevel();
+
+    int level = 1;
+
+    while (recipeDao.updateCalculationLevel(level)) {
+      level++;
+    }
   }
 
   private Price map(PricePageApiResponse.PriceResponse priceResponse, LocalDateTime time) {

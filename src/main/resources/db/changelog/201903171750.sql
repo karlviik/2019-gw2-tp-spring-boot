@@ -35,7 +35,8 @@ CREATE TABLE recipe(
   learned_from_item BOOLEAN NOT NULL,
   chat_link TEXT NOT NULL,
   out_item_id INTEGER NOT NULL,
-  out_item_count SMALLINT NOT NULL
+  out_item_count SMALLINT NOT NULL,
+  calculation_level SMALLINT NOT NULL
 );
 CREATE UNIQUE INDEX recipe_no_overwrite ON recipe (id, updated_at) WHERE updated_at IS NOT NULL;
 CREATE UNIQUE INDEX recipe_overwrite ON recipe (id) WHERE updated_at IS NULL;
