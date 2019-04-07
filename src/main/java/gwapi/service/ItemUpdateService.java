@@ -1,18 +1,30 @@
 package gwapi.service;
 
 import gwapi.dao.ItemDao;
-import gwapi.entity.*;
+import gwapi.entity.Item;
+import gwapi.entity.ItemRarity;
+import gwapi.entity.ItemSubSubType;
+import gwapi.entity.ItemSubType;
+import gwapi.entity.ItemType;
 import gwapi.web.apiresponse.IdListApiResponse;
 import gwapi.web.apiresponse.ItemPageApiResponse;
+import gwapi.web.apiresponse.ItemPageApiResponse.ItemResponse.Detail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.Math;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import java.util.*;
+import static java.util.function.Predicate.isEqual;
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Should have 2 methods:
@@ -98,59 +110,44 @@ public class ItemUpdateService {
   }
 
   private Item mapItem(ItemPageApiResponse.ItemResponse itemResponse) {
-    boolean bound = Arrays.stream(itemResponse.getFlags()).anyMatch(x -> x.equals("AccountBound") || x.equals("SoulbindOnAcquire"));
+    boolean bound = itemResponse.getFlags().stream().anyMatch(x -> x.equals("AccountBound") || x.equals("SoulbindOnAcquire"));
 
-    boolean nullVendor = Arrays.stream(itemResponse.getFlags()).anyMatch(x -> x.equals("NoSell"));
-    Integer vendor = nullVendor ? null : itemResponse.getVendorValue();
+    boolean nullVendor = itemResponse.getFlags().stream().anyMatch(x -> x.equals("NoSell"));
 
     String[] iconSplit = itemResponse.getIcon().split("/");
     Integer iconId = Integer.parseInt(iconSplit[iconSplit.length - 1].split("\\.")[0]);
 
-    ItemSubType subType;
-    ItemSubSubType subSubType;
-    List<Integer> upgrades;
-    List<Integer> infusions;
-    if (itemResponse.getDetail() != null) {
-      ItemPageApiResponse.ItemResponse.Detail detail = itemResponse.getDetail();
-      if (detail.getType() != null) {
-        subType = ItemSubType.valueOf(detail.getType().toUpperCase());
-        if (detail.getWeightClass() != null) {
-          subSubType = ItemSubSubType.valueOf(detail.getWeightClass().toUpperCase());
-        }
-        else {
-          subSubType = null;
-        }
-      }
-      else {
-        subType = null;
-        subSubType = null;
-      }
-      if (detail.getInfusions() != null && detail.getInfusions().size() > 0) {
-        infusions = new LinkedList<>();
-        for (ItemPageApiResponse.ItemResponse.Detail.InfusionSlot infusionSlot : detail.getInfusions()) {
-          infusions.add(infusionSlot.getId());
-        }
-      }
-      else {
-        infusions = null;
-      }
-      if (detail.getSubItem() != null) {
-        upgrades = new LinkedList<>();
-        upgrades.add(detail.getSubItem());
-        if (detail.getSubItem2() != null && detail.getSubItem2() != 0) {
-          upgrades.add(detail.getSubItem2());
-        }
-      }
-      else {
-        upgrades = null;
-      }
-    }
-    else {
-      subType = null;
-      subSubType = null;
-      upgrades = null;
-      infusions = null;
-    }
+    ItemSubType subType = Optional.ofNullable(itemResponse.getDetail())
+        .map(Detail::getType)
+        .map(String::toUpperCase)
+        .map(ItemSubType::valueOf)
+        .orElse(null);
+
+    ItemSubSubType subSubType = Optional.ofNullable(itemResponse.getDetail())
+        .map(Detail::getWeightClass)
+        .map(String::toUpperCase)
+        .map(ItemSubSubType::valueOf)
+        .orElse(null);
+
+    List<Integer> infusions = Optional.ofNullable(itemResponse.getDetail())
+        .map(Detail::getInfusions)
+        .stream()
+        .flatMap(Collection::stream)
+        .map(Detail.InfusionSlot::getId)
+        .collect(toList());
+
+    List<Integer> upgrades = Stream.of(
+        Optional.ofNullable(itemResponse.getDetail())
+          .map(Detail::getSubItem)
+          .stream(),
+        Optional.ofNullable(itemResponse.getDetail())
+          .map(Detail::getSubItem2)
+          .filter(not(isEqual(0)))
+          .stream()
+    )
+        .flatMap(Function.identity())
+        .collect(toList());
+
     return new Item(
         itemResponse.getId(),
         itemResponse.getName(),
@@ -159,7 +156,7 @@ public class ItemUpdateService {
         ItemRarity.valueOf(itemResponse.getRarity().toUpperCase()),
         itemResponse.getLevel(),
         bound,
-        vendor,
+        nullVendor ? null : itemResponse.getVendorValue(),
         ItemType.valueOf(itemResponse.getType().toUpperCase()),
         subType,
         subSubType,
@@ -173,22 +170,26 @@ public class ItemUpdateService {
         item.getName(),
         item.getChatLink(),
         item.getIconId(),
-        Objects.toString(item.getRarity()),
+        item.getRarity().name(),
         item.getLevel(),
         item.getBound(),
         item.getVendorValue(),
-        Objects.toString(item.getType()),
-        Objects.toString(item.getType2()),
-        Objects.toString(item.getType3()));
-    if (item.getItemUpgrades() != null) {
-      for (Integer upgrade : item.getItemUpgrades()) {
-        itemDao.createOrNothingUpgrade(item.getId(), upgrade);
-      }
-    }
-    if (item.getItemInfusions() != null) {
-      for (Integer infusion : item.getItemInfusions()) {
-        itemDao.createOrNothingInfusion(item.getId(), infusion);
-      }
-    }
+        Optional.ofNullable(item.getType()).map(ItemType::name).orElse(null),
+        Optional.ofNullable(item.getType2()).map(ItemSubType::name).orElse(null),
+        Optional.ofNullable(item.getType3()).map(ItemSubSubType::name).orElse(null));
+
+    Optional.ofNullable(item.getItemUpgrades())
+        .stream()
+        .flatMap(Collection::stream)
+        .forEach(upgrade -> {
+          itemDao.createOrNothingUpgrade(item.getId(), upgrade);
+        });
+
+    Optional.ofNullable(item.getItemInfusions())
+        .stream()
+        .flatMap(Collection::stream)
+        .forEach(infusion -> {
+          itemDao.createOrNothingInfusion(item.getId(), infusion);
+        });
   }
 }
