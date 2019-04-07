@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PriceCalculatorService {
 
-    @Autowired
-    PriceDao priceDao;
+  @Autowired
+  PriceDao priceDao;
 
-    @Autowired
-    RecipeDao recipeDao;
+  @Autowired
+  RecipeDao recipeDao;
 
 
 }

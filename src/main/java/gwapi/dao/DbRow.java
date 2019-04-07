@@ -12,36 +12,36 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
  */
 public class DbRow extends LinkedCaseInsensitiveMap<Object> {
 
-    public DbRow(int initialCapacity) {
-        super(initialCapacity);
-    }
+  public DbRow(int initialCapacity) {
+    super(initialCapacity);
+  }
 
-    public Long getLong(String columnLabel) {
-        return getValue(columnLabel);
-    }
+  public Long getLong(String columnLabel) {
+    return getValue(columnLabel);
+  }
 
-    public BigDecimal getBigDecimal(String columnLabel) {
-        return getValue(columnLabel);
-    }
+  public BigDecimal getBigDecimal(String columnLabel) {
+    return getValue(columnLabel);
+  }
 
-    public Integer getInteger(String columnLabel) {
-        return getValue(columnLabel);
-    }
+  public Integer getInteger(String columnLabel) {
+    return getValue(columnLabel);
+  }
 
-    public String getString(String columnLabel) {
-        return getValue(columnLabel);
-    }
+  public String getString(String columnLabel) {
+    return getValue(columnLabel);
+  }
 
-    public Boolean getBoolean(String columnLabel) {
-        return getValue(columnLabel);
-    }
+  public Boolean getBoolean(String columnLabel) {
+    return getValue(columnLabel);
+  }
 
-    public LocalDateTime getLocalDateTime(String columnLabel) {
-        return getValue(columnLabel);
-    }
+  public LocalDateTime getLocalDateTime(String columnLabel) {
+    return getValue(columnLabel);
+  }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getValue(String columnLabel) {
-        return (T) get(columnLabel);
-    }
+  @SuppressWarnings("unchecked")
+  public <T> T getValue(String columnLabel) {
+    return (T) get(columnLabel);
+  }
 }

@@ -5,10 +5,10 @@ package gwapi.entity;
  * None is none of them, new is something that isn't in the list yet
  */
 public enum ItemSubSubType {
-    NONE,
-    NEW,
-    HEAVY,
-    MEDIUM,
-    LIGHT,
-    CLOTHING
+  NONE,
+  NEW,
+  HEAVY,
+  MEDIUM,
+  LIGHT,
+  CLOTHING
 }

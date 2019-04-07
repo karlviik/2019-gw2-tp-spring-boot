@@ -6,21 +6,21 @@ package gwapi.entity;
  * NEW is used for when type exists but is not in this list.
  */
 public enum ItemType {
-    NONE,
-    NEW,
-    ARMOR,
-    BACK,
-    BAG,
-    CONSUMABLE,
-    CONTAINER,
-    CRAFTINGMATERIAL,
-    GATHERING,
-    GIZMO,
-    MINIPET,
-    TOOL,
-    TRAIT,
-    TRINKET,
-    TROPHY,
-    UPGRADECOMPONENT,
-    WEAPON
+  NONE,
+  NEW,
+  ARMOR,
+  BACK,
+  BAG,
+  CONSUMABLE,
+  CONTAINER,
+  CRAFTINGMATERIAL,
+  GATHERING,
+  GIZMO,
+  MINIPET,
+  TOOL,
+  TRAIT,
+  TRINKET,
+  TROPHY,
+  UPGRADECOMPONENT,
+  WEAPON
 }

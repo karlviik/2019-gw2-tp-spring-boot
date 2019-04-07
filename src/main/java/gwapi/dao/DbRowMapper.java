@@ -19,22 +19,22 @@ import org.springframework.jdbc.support.JdbcUtils;
  */
 public class DbRowMapper implements RowMapper<DbRow> {
 
-    @Override
-    public DbRow mapRow(ResultSet rs, int rowNum) throws SQLException {
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int columnCount = rsmd.getColumnCount();
-        DbRow mapOfColValues = new DbRow(columnCount);
+  @Override
+  public DbRow mapRow(ResultSet rs, int rowNum) throws SQLException {
+    ResultSetMetaData rsmd = rs.getMetaData();
+    int columnCount = rsmd.getColumnCount();
+    DbRow mapOfColValues = new DbRow(columnCount);
 
-        for (int i = 1; i <= columnCount; i++) {
-            String key = JdbcUtils.lookupColumnName(rsmd, i);
-            Object obj = getColumnValue(rs, i);
-            mapOfColValues.put(key, obj);
-        }
-
-        return mapOfColValues;
+    for (int i = 1; i <= columnCount; i++) {
+      String key = JdbcUtils.lookupColumnName(rsmd, i);
+      Object obj = getColumnValue(rs, i);
+      mapOfColValues.put(key, obj);
     }
 
-    private Object getColumnValue(ResultSet rs, int index) throws SQLException {
+    return mapOfColValues;
+  }
+
+  private Object getColumnValue(ResultSet rs, int index) throws SQLException {
 //        if (Timestamp.class.getName().equals(rs.getMetaData().getColumnClassName(index))) {
 //            return rs.getObject(index, LocalDateTime.class);
 //        }
@@ -43,6 +43,6 @@ public class DbRowMapper implements RowMapper<DbRow> {
 //            return rs.getObject(index, LocalDate.class);
 //        }
 
-        return JdbcUtils.getResultSetValue(rs, index);
-    }
+    return JdbcUtils.getResultSetValue(rs, index);
+  }
 }

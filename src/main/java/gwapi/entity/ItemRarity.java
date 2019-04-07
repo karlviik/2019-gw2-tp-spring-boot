@@ -7,14 +7,14 @@ package gwapi.entity;
  * right one otherwise
  */
 public enum ItemRarity {
-    NONE,
-    NEW,
-    JUNK,
-    BASIC,
-    FINE,
-    MASTERWORK,
-    RARE,
-    EXOTIC,
-    ASCENDED,
-    LEGENDARY
+  NONE,
+  NEW,
+  JUNK,
+  BASIC,
+  FINE,
+  MASTERWORK,
+  RARE,
+  EXOTIC,
+  ASCENDED,
+  LEGENDARY
 }

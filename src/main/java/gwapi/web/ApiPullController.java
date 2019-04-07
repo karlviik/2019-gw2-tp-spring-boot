@@ -11,21 +11,21 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 public class ApiPullController {
 
-    @Autowired
-    private RestTemplate restTemplate;
+  @Autowired
+  private RestTemplate restTemplate;
 
-    @Autowired
-    private PriceUpdateService priceUpdateService;
+  @Autowired
+  private PriceUpdateService priceUpdateService;
 
-    @Autowired
-    private RecipeUpdateService recipeUpdateService;
+  @Autowired
+  private RecipeUpdateService recipeUpdateService;
 
-    @Autowired
-    private ItemUpdateService itemUpdateService;
+  @Autowired
+  private ItemUpdateService itemUpdateService;
 
-    @GetMapping("/hello2")
-    public void fetchItems() {
-        priceUpdateService.updatePrices();
-    }
+  @GetMapping("/hello2")
+  public void fetchItems() {
+    priceUpdateService.updatePrices();
+  }
 
 }

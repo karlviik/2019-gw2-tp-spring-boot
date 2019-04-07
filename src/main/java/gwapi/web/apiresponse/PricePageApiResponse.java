@@ -9,40 +9,40 @@ import gwapi.web.apiresponse.PricePageApiResponse.PriceResponse;
 // example: https://api.guildwars2.com/v2/commerce/prices?page_size=200&page=125
 public class PricePageApiResponse extends ArrayList<PriceResponse> {
 
-    public static class PriceResponse {
+  public static class PriceResponse {
 
-        private int id;
+    private int id;
 
-        private Transaction buys;
+    private Transaction buys;
 
-        private Transaction sells;
+    private Transaction sells;
 
-        public int getId() {
-            return id;
-        }
-
-        public Transaction getBuys() {
-            return buys;
-        }
-
-        public Transaction getSells() {
-            return sells;
-        }
-
-        public static class Transaction {
-
-            private int quantity;
-
-            @JsonProperty("unit_price")
-            private int unitPrice;
-
-            public int getQuantity() {
-                return quantity;
-            }
-
-            public int getUnitPrice() {
-                return unitPrice;
-            }
-        }
+    public int getId() {
+      return id;
     }
+
+    public Transaction getBuys() {
+      return buys;
+    }
+
+    public Transaction getSells() {
+      return sells;
+    }
+
+    public static class Transaction {
+
+      private int quantity;
+
+      @JsonProperty("unit_price")
+      private int unitPrice;
+
+      public int getQuantity() {
+        return quantity;
+      }
+
+      public int getUnitPrice() {
+        return unitPrice;
+      }
+    }
+  }
 }
