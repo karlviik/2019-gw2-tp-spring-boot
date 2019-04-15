@@ -52,14 +52,6 @@ public class Item {
     this.itemInfusions = itemInfusions;
   }
 
-  @Override
-  public String toString() {
-    return String.join(", ",
-        String.valueOf(id),
-        String.valueOf(name),
-        String.valueOf(type));
-  }
-
   public Integer getId() {
     return id;
   }

@@ -25,6 +25,7 @@ public class ApiPullController {
 
   @GetMapping("/hello2")
   public void fetchItems() {
+    recipeUpdateService.addNewRecipes();
     priceUpdateService.updatePrices();
   }
 

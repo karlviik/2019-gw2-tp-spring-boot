@@ -18,7 +18,18 @@ public class Recipe {
   private List<RecipeComponent> components;
 
 
-  public Recipe(Integer recipeId, LocalDateTime overwriteTime, RecipeType type, Integer minRating, boolean learnedFromItem, String chatLink, Integer outItemId, Integer outItemCount, List<RecipeDiscipline> disciplines, List<RecipeComponent> components) {
+  public Recipe(
+      Integer recipeId,
+      LocalDateTime overwriteTime,
+      RecipeType type,
+      Integer minRating,
+      boolean learnedFromItem,
+      String chatLink,
+      Integer outItemId,
+      Integer outItemCount,
+      List<RecipeDiscipline> disciplines,
+      List<RecipeComponent> components
+  ) {
     this.recipeId = recipeId;
     this.overwriteTime = overwriteTime;
     this.type = type;
@@ -35,17 +46,6 @@ public class Recipe {
     this.outItemId = outItemId;
     this.outItemCount = outItemCount;
     this.components = components;
-  }
-
-  @Override
-  public String toString() {
-    return String.join(" ",
-        recipeId.toString(),
-        String.valueOf(overwriteTime),
-        type.toString(),
-        minRating.toString(),
-        String.valueOf(learnedFromItem),
-        String.valueOf(chatLink));
   }
 
   public Integer getRecipeId() {

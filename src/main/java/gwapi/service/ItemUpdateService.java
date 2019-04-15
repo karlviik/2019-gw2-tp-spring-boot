@@ -52,7 +52,7 @@ public class ItemUpdateService {
         null,
         IdListApiResponse.class);
     List<Integer> allApiItemIds = allApiItemIdsResponse.getBody();
-    List<Integer> allDatabaseItemIds = itemDao.getAllItemIds();
+    List<Integer> allDatabaseItemIds = itemDao.getItemIds();
 
     HashSet<Integer> uncommonElements = new HashSet<>(allApiItemIds);
     for (Integer b : allDatabaseItemIds) {

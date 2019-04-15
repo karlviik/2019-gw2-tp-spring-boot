@@ -1,6 +1,7 @@
 package gwapi.web.apiresponse;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gwapi.web.apiresponse.ItemPageApiResponse.ItemResponse;
@@ -25,7 +26,7 @@ public class ItemPageApiResponse extends ArrayList<ItemResponse> {
 
     private String icon;
 
-    private String[] flags;
+    private List<String> flags;
 
     @JsonProperty("vendor_value")
     private Integer vendorValue;
@@ -61,7 +62,7 @@ public class ItemPageApiResponse extends ArrayList<ItemResponse> {
       return icon;
     }
 
-    public String[] getFlags() {
+    public List<String> getFlags() {
       return flags;
     }
 
@@ -87,7 +88,7 @@ public class ItemPageApiResponse extends ArrayList<ItemResponse> {
       private Integer subItem2;
 
       @JsonProperty("infusion_slots")
-      private ArrayList<InfusionSlot> infusions;
+      private List<InfusionSlot> infusions;
 
       public String getType() {
         return type;
@@ -105,7 +106,7 @@ public class ItemPageApiResponse extends ArrayList<ItemResponse> {
         return subItem2;
       }
 
-      public ArrayList<InfusionSlot> getInfusions() {
+      public List<InfusionSlot> getInfusions() {
         return infusions;
       }
 

@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,19 +18,25 @@ public class RecipeDao extends JdbcDao {
 
   // used to create new listing for a recipe that most definitely does not exist yet
   public void createNew(Recipe recipe) {
-    update(
-        "INSERT INTO recipe(id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count, calculation_level) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)",
-        recipe.getRecipeId(), recipe.getOverwriteTime(), Objects.toString(recipe.getType()), recipe.getMinRating(), recipe.isLearnedFromItem(), recipe.getChatLink(), recipe.getOutItemId(), recipe.getOutItemCount());
+    createRecipeIfNew(
+        recipe.getRecipeId(),
+        null,
+        recipe.getType().name(),
+        recipe.getMinRating(),
+        recipe.isLearnedFromItem(),
+        recipe.getChatLink(),
+        recipe.getOutItemId(),
+        recipe.getOutItemCount()
+    );
     for (RecipeDiscipline discipline : recipe.getDisciplines()) {
-      update("INSERT INTO recipe_discipline(recipe_id, discipline) VALUES (?, ?) ON CONFLICT DO NOTHING", recipe.getRecipeId(), Objects.toString(discipline));
+      addDisciplineOrNothing(recipe.getRecipeId(), discipline.name());
     }
     for (RecipeComponent component : recipe.getComponents()) {
-      update("INSERT INTO recipe_component(recipe_id, updated_at, component_item_id, component_item_count) VALUES (?, ?, ?, ?)", recipe.getRecipeId(), null, component.getId(), component.getCount());
+      addComponentIfNew(recipe.getRecipeId(), component.getId(), component.getCount());
     }
   }
 
-  public void createNewRecipe(
+  public void createRecipeIfNew(
       Integer id,
       Timestamp updatedAt,
       String type,
@@ -43,19 +48,45 @@ public class RecipeDao extends JdbcDao {
   ) {
     update(
         "INSERT INTO recipe(id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count, calculation_level) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)", id, updatedAt, type, minRating, learnedFromItem, chatLink, outItemId, outItemCount);
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1) " +
+            "ON CONFLICT DO NOTHING",
+        id, updatedAt, type, minRating, learnedFromItem, chatLink, outItemId, outItemCount);
   }
 
   public void addDisciplineOrNothing(Integer id, String discipline) {
-    update("INSERT INTO recipe_discipline(recipe_id, discipline) VALUES (?, ?) ON CONFLICT (recipe_id, discipline) DO NOTHING", id, discipline);
+    update(
+        "INSERT INTO recipe_discipline(recipe_id, discipline) " +
+            "VALUES (?, ?) " +
+            "ON CONFLICT (recipe_id, discipline) DO NOTHING",
+        id, discipline
+    );
   }
 
-  public void addNewComponent(Integer recipeId, Integer componentId, Integer componentCount) {
-    update("INSERT INTO recipe_component(recipe_id, updated_at, component_item_id, component_item_count) VALUES (?, ?, ?, ?)", recipeId, null, componentId, componentCount);
+  public void addComponentIfNew(Integer recipeId, Integer componentId, Integer componentCount) {
+    update(
+        "INSERT INTO recipe_component(recipe_id, updated_at, component_item_id, component_item_count) " +
+            "VALUES (?, ?, ?, ?) " +
+            "ON CONFLICT DO NOTHING",
+        recipeId, null, componentId, componentCount
+    );
   }
 
-  public void setRecipeIdUpdateTime() {
+  public void setRecipeUpdateTime(Integer recipeId, Timestamp updatedAt) {
+    update(
+        "UPDATE recipe " +
+        "SET updated_at=? " +
+        "WHERE id=? AND updated_at IS NULL",
+        updatedAt, recipeId
+    );
+  }
 
+  public void setComponentUpdateTime(Integer recipeId, Timestamp updatedAt) {
+    update(
+        "UPDATE recipe_component " +
+        "SET updated_at=? " +
+        "WHERE recipe_id=? AND updated_at IS NULL",
+        updatedAt, recipeId
+    );
   }
 
   // used to either create a new recipe if it's not already
@@ -72,18 +103,28 @@ public class RecipeDao extends JdbcDao {
     else {
       Recipe currentRecipe = currentRecipes.get(0);
       if (!currentRecipe.equals(recipe)) {
-        update("UPDATE recipe SET updated_at=? WHERE id=? AND updated_at IS NULL", Timestamp.valueOf(time), recipe.getRecipeId());
-        update("UPDATE recipe_component SET updated_at=? WHERE recipe_id=? AND updated_at IS NULL", Timestamp.valueOf(time), recipe.getRecipeId());
+        setRecipeUpdateTime(recipe.getRecipeId(), Timestamp.valueOf(time));
+        setComponentUpdateTime(recipe.getRecipeId(), Timestamp.valueOf(time));
         createNew(recipe);
       }
     }
   }
 
   public List<Recipe> searchCurrentByRecipeId(int recipeId) {
-    List<RecipeComponent> components = list("SELECT component_item_id, component_item_count FROM recipe_component WHERE recipe_id=? AND updated_at IS NULL", recipeId).stream()
+    List<RecipeComponent> components = list(
+        "SELECT component_item_id, component_item_count " +
+            "FROM recipe_component " +
+            "WHERE recipe_id=? AND updated_at IS NULL",
+        recipeId
+    ).stream()
         .map(result -> mapComponent(result))
         .collect(Collectors.toList());
-    return list("SELECT id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count FROM recipe WHERE id=? AND updated_at IS NULL", recipeId).stream()
+    return list(
+        "SELECT id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count " +
+            "FROM recipe " +
+            "WHERE id=? AND updated_at IS NULL",
+        recipeId
+    ).stream()
         .map(result -> mapRecipeWithComponents(result, components))
         .collect(Collectors.toList());
   }
@@ -94,13 +135,23 @@ public class RecipeDao extends JdbcDao {
         .collect(Collectors.toList());
   }
 
-  public List<Recipe> searchCurrentByOutId(int outId) {
-    List<DbRow> listOfResults = list("SELECT id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count FROM recipe WHERE out_item_id=? AND updated_at IS NULL", outId);
+  public List<Recipe> searchCurrentByCalculationLevel(int level) {
+    List<DbRow> listOfResults = list(
+        "SELECT id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count " +
+            "FROM recipe " +
+            "WHERE calculation_level=? AND updated_at IS NULL",
+        level
+    );
     ArrayList<Recipe> recipes = new ArrayList<>();
     for (DbRow row : listOfResults) {
       Integer recipeId = row.getInteger("id");
-      List<RecipeComponent> components = list("SELECT component_item_id, component_item_count FROM recipe_component WHERE recipe_id=? AND updated_at IS NULL", recipeId).stream()
-          .map(result -> mapComponent(result))
+      List<RecipeComponent> components = list(
+          "SELECT component_item_id, component_item_count " +
+              "FROM recipe_component " +
+              "WHERE recipe_id=? AND updated_at IS NULL",
+          recipeId
+      ).stream()
+          .map(this::mapComponent)
           .collect(Collectors.toList());
       recipes.add(mapRecipeWithComponents(row, components));
     }
@@ -109,17 +160,17 @@ public class RecipeDao extends JdbcDao {
 
 
   public void resetCalculationLevel() {
-    update("UPDATE recipe SET calculation_order = 1");
+    update("UPDATE recipe SET calculation_level = 1");
   }
 
   public boolean updateCalculationLevel(int level) {
     return update("UPDATE recipe " +
-        "SET level = ? " +
+        "SET calculation_level = ? " +
         "WHERE id IN (" +
         "  SELECT rc.recipe_id " +
         "  FROM recipe r " +
         "  JOIN recipe_component rc ON r.out_item_id = rc.component_item_id " +
-        "  WHERE r.level = ?)", level + 1, level) > 0;
+        "  WHERE r.calculation_level = ?)", level + 1, level) > 0;
   }
 
   public HashSet<Integer> getAllOutIds() {

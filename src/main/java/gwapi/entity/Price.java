@@ -35,16 +35,6 @@ public class Price {
     this.craftSellPrice = craftSellPrice;
   }
 
-  @Override
-  public String toString() {
-    return String.join(" ",
-        String.valueOf(id),
-        String.valueOf(buyPrice),
-        String.valueOf(buyQuantity),
-        String.valueOf(sellPrice),
-        String.valueOf(sellQuantity));
-  }
-
   public int getId() {
     return id;
   }

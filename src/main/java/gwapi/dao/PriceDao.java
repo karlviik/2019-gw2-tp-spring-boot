@@ -21,22 +21,40 @@ public class PriceDao extends JdbcDao {
       Integer sellPrice,
       Integer sellQuantity
   ) {
-    update("INSERT INTO price(item_id, created_at, buy_price, buy_quantity, sell_price, sell_quantity) VALUES(?, ?, ?, ?, ?, ?)", itemId, createdAt, buyPrice, buyQuantity, sellPrice, sellQuantity);
+    update(
+        "INSERT INTO price(item_id, created_at, buy_price, buy_quantity, sell_price, sell_quantity) " +
+        "VALUES(?, ?, ?, ?, ?, ?)",
+        itemId, createdAt, buyPrice, buyQuantity, sellPrice, sellQuantity);
   }
 
   public void addCraftData(Integer itemId, Timestamp time, Integer craftBuy, Integer craftSell) {
-    update("INSERT INTO price(item_id, created_at, craft_buy_price, craft_sell_price) VALUES(?, ?, ?, ?) ON CONFLICT (item_id, created_at) DO UPDATE SET craft_buy_price=?, craft_sell_price=?", itemId, time, craftBuy, craftSell, craftBuy, craftSell);
+    update(
+        "INSERT INTO price(item_id, created_at, craft_buy_price, craft_sell_price) " +
+        "VALUES(?, ?, ?, ?) " +
+        "ON CONFLICT (item_id, created_at) DO UPDATE " +
+        "SET craft_buy_price=?, craft_sell_price=?",
+        itemId, time, craftBuy, craftSell, craftBuy, craftSell);
   }
 
   public LinkedList<Integer> getCraftData(Integer itemId, LocalDateTime time) {
-    List<LinkedList<Integer>> list = list("SELECT craft_buy_price, craft_sell_price FROM price WHERE item_id=? AND created_at=?", itemId, Timestamp.valueOf(time)).stream()
+    List<LinkedList<Integer>> list = list(
+        "SELECT craft_buy_price, craft_sell_price " +
+            "FROM price " +
+            "WHERE item_id=? AND created_at=?",
+        itemId, Timestamp.valueOf(time))
+        .stream()
         .map(x -> mapCraftPrices(x))
         .collect(Collectors.toList());
     return list.size() == 0 ? null : list.get(0);
   }
 
   public Price getTradePostAndCraftPrice(Integer itemId, LocalDateTime time) {
-    List<Price> list = list("SELECT buy_price, sell_price, craft_buy_price, craft_sell_price FROM price WHERE item_id=? AND created_at=?", itemId, Timestamp.valueOf(time)).stream()
+    List<Price> list = list(
+        "SELECT buy_price, sell_price, craft_buy_price, craft_sell_price " +
+            "FROM price " +
+            "WHERE item_id=? AND created_at=?",
+        itemId, Timestamp.valueOf(time))
+        .stream()
         .map(x -> mapTradePostAndCraftPrice(itemId, x))
         .collect(Collectors.toList());
     return list.size() == 0 ? null : list.get(0);

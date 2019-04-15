@@ -13,20 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.time.ZoneOffset.UTC;
 
-/**
- * should have a method to:
- * a) update absolutely all entries while paying attention to if recipe has changed, in those cases properly add
- * overwrite time to recipe and components
- * b) add new entries (like when no build change)
- */
 @Component
 public class RecipeUpdateService {
 
@@ -36,39 +30,48 @@ public class RecipeUpdateService {
   @Autowired
   private RecipeDao recipeDao;
 
+  /**
+   * @return false if no recipes added, true otherwise
+   */
   public void addNewRecipes() {
     ResponseEntity<IdListApiResponse> allApiRecipeIdsResponse = restTemplate.exchange(
         "https://api.guildwars2.com/v2/recipes",
         HttpMethod.GET,
         null,
-        IdListApiResponse.class);
-    LinkedList<Integer> allApiRecipeIds = new LinkedList<>(allApiRecipeIdsResponse.getBody());
-    LinkedList<Integer> allDatabaseRecipeIds = new LinkedList<>(recipeDao.getAllRecipeIds());
-    for (Integer dbId : allDatabaseRecipeIds) {
-      allApiRecipeIds.remove(dbId);
+        IdListApiResponse.class
+    );
+
+    List<Integer> apiRecipeIds = allApiRecipeIdsResponse.getBody();
+    List<Integer> databaseRecipeIds = recipeDao.getAllRecipeIds();
+    for (Integer dbId : databaseRecipeIds) {
+      apiRecipeIds.remove(dbId);
     }
-    if (allApiRecipeIds.size() == 0) {
+    if (apiRecipeIds.size() == 0) {
       return;
     }
-    for (int i = 0; i < (int) Math.ceil(allApiRecipeIds.size() / 200.0); i++) {
+    for (int i = 0; i < (int) Math.ceil(apiRecipeIds.size() / 200.0); i++) {
       StringBuilder sb = new StringBuilder();
       sb.append("https://api.guildwars2.com/v2/recipes?ids=");
-      int end = Math.min((i + 1) * 200, allApiRecipeIds.size());
+      int end = Math.min((i + 1) * 200, apiRecipeIds.size());
       for (int j = i * 200; j < end; j++) {
-        sb.append(allApiRecipeIds.get(j));
+        sb.append(apiRecipeIds.get(j));
         if (j < end - 1) {
           sb.append(",");
         }
       }
+
       ResponseEntity<RecipePageApiResponse> recipePageApiResponse = restTemplate.exchange(
           sb.toString(),
           HttpMethod.GET,
           null,
-          RecipePageApiResponse.class);
+          RecipePageApiResponse.class
+      );
+
       recipePageApiResponse.getBody().stream()
           .map(this::mapRecipe)
-          .forEach(recipe -> recipeDao.createNew(recipe));
+          .forEach(this::addNewRecipeToDatabase);
     }
+    updateRecipeCalculationOrder();
   }
 
   public void updateAllRecipes() {
@@ -93,8 +96,37 @@ public class RecipeUpdateService {
           .map(this::mapRecipe)
           .forEach(recipe -> recipeDao.createOrUpdate(recipe, time));
     }
+    updateRecipeCalculationOrder();
   }
 
+  private void addNewRecipeToDatabase(Recipe recipe) {
+    recipeDao.createRecipeIfNew(
+        recipe.getRecipeId(),
+        Timestamp.valueOf(recipe.getOverwriteTime()),
+        recipe.getType().name(),
+        recipe.getMinRating(),
+        recipe.isLearnedFromItem(),
+        recipe.getChatLink(),
+        recipe.getOutItemId(),
+        recipe.getOutItemCount()
+    );
+    for (RecipeDiscipline discipline : recipe.getDisciplines()) {
+      recipeDao.addDisciplineOrNothing(
+          recipe.getRecipeId(),
+          discipline.name()
+      );
+    }
+    for (RecipeComponent component : recipe.getComponents()) {
+      recipeDao.addComponentIfNew(
+          recipe.getRecipeId(),
+          component.getId(),
+          component.getCount()
+      );
+    }
+  }
+
+
+  // TODO: refactor this
   private Recipe mapRecipe(RecipePageApiResponse.RecipeResponse recipeResponse) {
     ArrayList<RecipePageApiResponse.RecipeResponse.Ingredient> ingredients = recipeResponse.getIngredients();
     List<RecipeComponent> components = new ArrayList<>();
@@ -119,5 +151,15 @@ public class RecipeUpdateService {
         recipeResponse.getOutCount(),
         disciplines,
         components);
+  }
+
+  public void updateRecipeCalculationOrder() {
+    recipeDao.resetCalculationLevel();
+
+    int level = 1;
+
+    while (recipeDao.updateCalculationLevel(level)) {
+      level++;
+    }
   }
 }

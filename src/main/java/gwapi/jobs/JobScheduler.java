@@ -34,7 +34,7 @@ public class JobScheduler {
         BuildApiResponse.class);
     Integer currentVersion = build.getBody().getId();
     if (versionDao.getVersion() != currentVersion) {
-      versionDao.updateVersion(currentVersion);
+      versionDao.setVersion(currentVersion);
       itemUpdateService.updateAllItems();
       recipeUpdateService.updateAllRecipes();
       // this means new build has happened, need to trigger

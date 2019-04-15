@@ -40,116 +40,53 @@ public class PriceUpdateService {
   public void updatePrices() {
     LocalDateTime time = LocalDateTime.now(UTC);
     getTradePostPricePoints(time);
-//    getCraftPricePoints(time);
+    getCraftPricePoints(time);
   }
 
   private void getCraftPricePoints(LocalDateTime time) {
-    HashSet<Integer> allRecipeOutItemIds = recipeDao.getAllOutIds();
-    for (Integer outItemId : allRecipeOutItemIds) {
-      calculateCraftingCost(outItemId, time);
+    int level = 1;
+    while (true) {
+      List<Recipe> recipes = recipeDao.searchCurrentByCalculationLevel(level);
+      if (recipes == null || recipes.size() == 0) {
+        break;
+      }
+      for (Recipe recipe : recipes) {
+        Integer craftBuy = 0;
+        Integer craftSell = 0;
+        for (RecipeComponent component : recipe.getComponents()) {
+          Price componentPrice = priceDao.getTradePostAndCraftPrice(component.getId(), time);
+          if (componentPrice != null) {
+            craftBuy += customMinPrice(componentPrice.getBuyPrice(), componentPrice.getCraftBuyPrice()) * component.getCount();
+            craftSell += customMinPrice(componentPrice.getSellPrice(), componentPrice.getCraftSellPrice()) * component.getCount();
+          }
+        }
+        if (craftBuy == 0) {
+          craftBuy = null;
+        } else {
+          craftBuy /= recipe.getOutItemCount();
+        }
+        if (craftSell == 0) {
+          craftSell = null;
+        } else {
+          craftSell /= recipe.getOutItemCount();
+        }
+        priceDao.addCraftData(recipe.getOutItemId(), Timestamp.valueOf(time), craftBuy, craftSell);
+      }
+      level++;
     }
   }
 
-  private List<Integer> calculateCraftingCost(Integer outItemId, LocalDateTime time) {
-    // input should be item ID
-    // if id has no recipes where it is the output, give back
-    // null
-    Price itemPrice = priceDao.getTradePostAndCraftPrice(outItemId, time);
-    if (itemPrice != null && (itemPrice.getCraftBuyPrice() != null || itemPrice.getCraftSellPrice() != null)) {
-      LinkedList<Integer> returnList = new LinkedList<>();
-      returnList.add(itemPrice.getCraftBuyPrice());
-      returnList.add(itemPrice.getCraftSellPrice());
-      return returnList;
+  private int customMinPrice(Integer a, Integer b) {
+    if (a == null && b == null) {
+      return 0;
     }
-    List<Recipe> associatedRecipes = recipeDao.searchCurrentByOutId(outItemId);
-    if (associatedRecipes == null || associatedRecipes.size() == 0) {
-      return null;
+    else if (a == null) {
+      return b;
     }
-    ArrayList<Integer> recipeBuyCosts = new ArrayList<>();
-    ArrayList<Integer> recipeSellCosts = new ArrayList<>();
-
-    for (Recipe recipe : associatedRecipes) {
-      Integer costToBuyCraft = 0;
-      Integer costToSellCraft = 0;
-      for (RecipeComponent component : recipe.getComponents()) {
-        Price componentPrice = priceDao.getTradePostAndCraftPrice(component.getId(), time);
-        if (componentPrice == null) {
-          List<Integer> componentCraftCost = calculateCraftingCost(component.getId(), time);
-          if (componentCraftCost == null) {
-            continue;
-          }
-          else {
-            costToBuyCraft += componentCraftCost.get(0) != null ? componentCraftCost.get(0) : 0;
-            costToSellCraft += componentCraftCost.get(1) != null ? componentCraftCost.get(1) : 0;
-            continue;
-          }
-        }
-        else {
-          List<Integer> componentCraftCost = calculateCraftingCost(component.getId(), time);
-          if (componentPrice.getCraftBuyPrice() != null && componentPrice.getBuyPrice() != null) {
-            costToBuyCraft += Math.min(componentPrice.getCraftBuyPrice(), componentPrice.getBuyPrice()) * component.getCount();
-          }
-          else if (componentPrice.getCraftBuyPrice() != null) {
-            costToBuyCraft += componentPrice.getCraftBuyPrice() * component.getCount();
-          }
-          else {
-            if (componentPrice.getBuyPrice() == null) {
-              costToBuyCraft += (componentCraftCost != null ? componentCraftCost.get(0) != null ? componentCraftCost.get(0) : 0 : 0) * component.getCount();
-            }
-            else {
-              if (componentCraftCost == null || componentCraftCost.get(0) == null) {
-                costToBuyCraft += componentPrice.getBuyPrice() * component.getCount();
-              }
-              else {
-                costToBuyCraft += Math.min(componentPrice.getBuyPrice(), componentCraftCost.get(0)) * component.getCount();
-              }
-            }
-          }
-          if (componentPrice.getCraftSellPrice() != null && componentPrice.getSellPrice() != null) {
-            costToSellCraft += Math.min(componentPrice.getCraftSellPrice(), componentPrice.getSellPrice()) * component.getCount();
-          }
-          else if (componentPrice.getCraftSellPrice() != null) {
-            costToSellCraft += componentPrice.getCraftSellPrice() * component.getCount();
-          }
-          else {
-            if (componentPrice.getSellPrice() == null) {
-              costToSellCraft += (componentCraftCost != null ? componentCraftCost.get(1) != null ? componentCraftCost.get(1) : 0 : 0) * component.getCount();
-            }
-            else {
-              if (componentCraftCost == null || componentCraftCost.get(1) == null) {
-                costToSellCraft += componentPrice.getSellPrice() * component.getCount();
-              }
-              else {
-                costToSellCraft += Math.min(componentPrice.getSellPrice(), componentCraftCost.get(1)) * component.getCount();
-              }
-            }
-          }
-        }
-      }
-      if (costToBuyCraft != 0) {
-        recipeBuyCosts.add(costToBuyCraft / recipe.getOutItemCount());
-      }
-      if (costToSellCraft != 0) {
-        recipeSellCosts.add(costToSellCraft / recipe.getOutItemCount());
-      }
+    else if (b == null) {
+      return a;
     }
-    LinkedList<Integer> returnList = new LinkedList<>();
-    Integer buyCraft = recipeBuyCosts.size() != 0 ? Collections.min(recipeBuyCosts) : null;
-    Integer sellCraft = recipeSellCosts.size() != 0 ? Collections.min(recipeSellCosts) : null;
-    returnList.add(buyCraft);
-    returnList.add(sellCraft);
-    priceDao.addCraftData(outItemId, Timestamp.valueOf(time), buyCraft, sellCraft);
-    System.out.println(outItemId + " " + time + " " + buyCraft + " " + sellCraft);
-    return returnList;
-
-    // otherwise calculate costs of all the recipes related to the item
-    // and for each component in the thing, ask for minimal of
-    // craft and trade post, but the function gives back only craft
-
-    // result of calculation should be minimal cost of crafting the item
-    // one for the buy price, other sell price
-    // before returning those values, the thing should also add them
-    // to the database
+    return Math.min(a, b);
   }
 
   private void getTradePostPricePoints(LocalDateTime time) {
@@ -176,15 +113,7 @@ public class PriceUpdateService {
 
   }
 
-  public void updateRecipeCalculationOrder() {
-    recipeDao.resetCalculationLevel();
 
-    int level = 1;
-
-    while (recipeDao.updateCalculationLevel(level)) {
-      level++;
-    }
-  }
 
   private Price map(PricePageApiResponse.PriceResponse priceResponse, LocalDateTime time) {
     return new Price(
