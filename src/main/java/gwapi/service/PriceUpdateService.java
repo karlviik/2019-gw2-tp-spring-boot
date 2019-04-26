@@ -54,8 +54,9 @@ public class PriceUpdateService {
         Integer craftBuy = 0;
         Integer craftSell = 0;
         for (RecipeComponent component : recipe.getComponents()) {
-          Price componentPrice = priceDao.getTradePostAndCraftPrice(component.getId(), time);
-          if (componentPrice != null) {
+          Optional<Price> componentPriceOptional = priceDao.getTradePostAndCraftPrice(component.getId(), time);
+          if (componentPriceOptional.isPresent()) {
+            Price componentPrice = componentPriceOptional.get();
             craftBuy += customMinPrice(componentPrice.getBuyPrice(), componentPrice.getCraftBuyPrice()) * component.getCount();
             craftSell += customMinPrice(componentPrice.getSellPrice(), componentPrice.getCraftSellPrice()) * component.getCount();
           }

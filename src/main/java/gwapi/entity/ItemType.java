@@ -22,5 +22,6 @@ public enum ItemType {
   TRINKET,
   TROPHY,
   UPGRADECOMPONENT,
-  WEAPON
+  WEAPON,
+  KEY
 }

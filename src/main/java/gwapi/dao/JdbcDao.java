@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Courtesy of Henri Viik.
+ */
 public abstract class JdbcDao {
 
   @Autowired

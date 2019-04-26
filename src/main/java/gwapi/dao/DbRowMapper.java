@@ -16,6 +16,8 @@ import org.springframework.jdbc.support.JdbcUtils;
  * Mostly copy of {@link ColumnMapRowMapper}.
  * Returns {@link LocalDateTime} instead of {@link Timestamp}.
  * Returns {@link LocalDate} instead of {@link Date}.
+ *
+ * Courtesy of Henri Viik
  */
 public class DbRowMapper implements RowMapper<DbRow> {
 

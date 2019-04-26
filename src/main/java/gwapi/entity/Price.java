@@ -12,10 +12,10 @@ public class Price {
   private Integer sellQuantity;
   private Integer craftBuyPrice;
   private Integer craftSellPrice;
-  private Integer openBuyPrice;
-  private Integer openSellPrice;
-  private Integer mysticForgeBuyPrice;
-  private Integer mysticForgeSellPrice;
+//  private Integer openBuyPrice;
+//  private Integer openSellPrice;
+//  private Integer mysticForgeBuyPrice;
+//  private Integer mysticForgeSellPrice;
 
 
   public Price(int id, LocalDateTime time, Integer buyPrice, Integer buyQuantity, Integer sellPrice, Integer sellQuantity) {

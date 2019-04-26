@@ -6,12 +6,16 @@ import gwapi.entity.RecipeDiscipline;
 import gwapi.entity.RecipeType;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.function.Predicate.isEqual;
 
 @Component
 public class RecipeDao extends JdbcDao {
@@ -96,37 +100,29 @@ public class RecipeDao extends JdbcDao {
   // if doesn't, then updates the current recipe + components in database with overwrite time
   // and also adds the new recipe
   public void createOrUpdate(Recipe recipe, LocalDateTime time) {
-    List<Recipe> currentRecipes = searchCurrentByRecipeId(recipe.getRecipeId());
-    if (currentRecipes.size() == 0) {
-      createNew(recipe);
+    Optional<Recipe> optionalRecipe = searchCurrentByRecipeId(recipe.getRecipeId());
+    if (optionalRecipe.filter(isEqual(recipe)).isPresent()) {
+      return;
     }
-    else {
-      Recipe currentRecipe = currentRecipes.get(0);
-      if (!currentRecipe.equals(recipe)) {
-        setRecipeUpdateTime(recipe.getRecipeId(), Timestamp.valueOf(time));
-        setComponentUpdateTime(recipe.getRecipeId(), Timestamp.valueOf(time));
-        createNew(recipe);
-      }
+    if (optionalRecipe.isPresent()) {
+      setRecipeUpdateTime(recipe.getRecipeId(), Timestamp.valueOf(time));
+      setComponentUpdateTime(recipe.getRecipeId(), Timestamp.valueOf(time));
     }
+    createNew(recipe);
   }
 
-  public List<Recipe> searchCurrentByRecipeId(int recipeId) {
-    List<RecipeComponent> components = list(
-        "SELECT component_item_id, component_item_count " +
+  public Optional<Recipe> searchCurrentByRecipeId(int recipeId) {
+    List<DbRow> components = list(
+        "SELECT recipe_id, component_item_id, component_item_count " +
             "FROM recipe_component " +
             "WHERE recipe_id=? AND updated_at IS NULL",
-        recipeId
-    ).stream()
-        .map(result -> mapComponent(result))
-        .collect(Collectors.toList());
-    return list(
+        recipeId);
+    return tryOne(
         "SELECT id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count " +
             "FROM recipe " +
             "WHERE id=? AND updated_at IS NULL",
-        recipeId
-    ).stream()
-        .map(result -> mapRecipeWithComponents(result, components))
-        .collect(Collectors.toList());
+        (rs, i) -> mapRecipe(rs, components),
+        recipeId);
   }
 
   public List<Integer> getAllRecipeIds() {
@@ -136,28 +132,19 @@ public class RecipeDao extends JdbcDao {
   }
 
   public List<Recipe> searchCurrentByCalculationLevel(int level) {
-    List<DbRow> listOfResults = list(
+    List<DbRow> components = list(
+        "SELECT recipe_id, component_item_id, component_item_count " +
+            "FROM recipe_component " +
+            "WHERE updated_at IS NULL");
+
+    return list(
         "SELECT id, updated_at, type, min_rating, learned_from_item, chat_link, out_item_id, out_item_count " +
             "FROM recipe " +
             "WHERE calculation_level=? AND updated_at IS NULL",
+        (rs, i) -> mapRecipe(rs, components),
         level
     );
-    ArrayList<Recipe> recipes = new ArrayList<>();
-    for (DbRow row : listOfResults) {
-      Integer recipeId = row.getInteger("id");
-      List<RecipeComponent> components = list(
-          "SELECT component_item_id, component_item_count " +
-              "FROM recipe_component " +
-              "WHERE recipe_id=? AND updated_at IS NULL",
-          recipeId
-      ).stream()
-          .map(this::mapComponent)
-          .collect(Collectors.toList());
-      recipes.add(mapRecipeWithComponents(row, components));
-    }
-    return recipes;
   }
-
 
   public void resetCalculationLevel() {
     update("UPDATE recipe SET calculation_level = 1");
@@ -186,18 +173,22 @@ public class RecipeDao extends JdbcDao {
     );
   }
 
-  private Recipe mapRecipeWithComponents(DbRow row, List<RecipeComponent> components) {
+  private Recipe mapRecipe(ResultSet rs, List<DbRow> components) throws SQLException {
+    int recipeId = rs.getInt("id");
     return new Recipe(
-        row.getInteger("id"),
-        row.getLocalDateTime("updated_at"),
-        RecipeType.valueOf(row.getString("type")),
-        row.getInteger("min_rating"),
-        row.getBoolean("learned_from_item"),
-        row.getString("chat_link"),
-        row.getInteger("out_item_id"),
-        row.getInteger("out_item_count"),
+        recipeId,
+        rs.getObject("updated_at", LocalDateTime.class),
+        RecipeType.valueOf(rs.getString("type")),
+        rs.getInt("min_rating"),
+        rs.getBoolean("learned_from_item"),
+        rs.getString("chat_link"),
+        rs.getInt("out_item_id"),
+        rs.getInt("out_item_count"),
         null,
-        components
+        components.stream()
+        .filter(row -> row.getInteger("recipe_id").equals(recipeId))
+        .map(this::mapComponent)
+        .collect(Collectors.toList())
     );
   }
 }
