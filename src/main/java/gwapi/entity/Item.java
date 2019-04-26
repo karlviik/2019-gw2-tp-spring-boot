@@ -52,6 +52,18 @@ public class Item {
     this.itemInfusions = itemInfusions;
   }
 
+  public Item(Integer id, String name, String chatLink, String iconLink, ItemRarity rarity, Integer level, Boolean bound, Integer vendorValue, ItemType type) {
+    this.id = id;
+    this.name = name;
+    this.chatLink = chatLink;
+    this.iconLink = iconLink;
+    this.rarity = rarity;
+    this.level = level;
+    this.bound = bound;
+    this.vendorValue = vendorValue;
+    this.type = type;
+  }
+
   public Integer getId() {
     return id;
   }
