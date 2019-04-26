@@ -4,7 +4,7 @@ CREATE TABLE item(
   id INTEGER NOT NULL,
   name TEXT NOT NULL,
   chat_link TEXT NOT NULL,
-  icon_id INTEGER, --think it's not null, not sure
+  icon_link TEXT, --can be null
   rarity TEXT NOT NULL,
   level SMALLINT,  --not null?
   bound BOOLEAN NOT NULL,

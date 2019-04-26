@@ -114,8 +114,10 @@ public class ItemUpdateService {
 
     boolean nullVendor = itemResponse.getFlags().stream().anyMatch(x -> x.equals("NoSell"));
 
-    String[] iconSplit = itemResponse.getIcon().split("/");
-    Integer iconId = Integer.parseInt(iconSplit[iconSplit.length - 1].split("\\.")[0]);
+    String iconLink = null;
+    if (itemResponse.getIcon() != null) {
+      iconLink = itemResponse.getIcon();
+    }
 
     ItemSubType subType = Optional.ofNullable(itemResponse.getDetail())
         .map(Detail::getType)
@@ -152,7 +154,7 @@ public class ItemUpdateService {
         itemResponse.getId(),
         itemResponse.getName(),
         itemResponse.getChatLink(),
-        iconId,
+        iconLink,
         ItemRarity.valueOf(itemResponse.getRarity().toUpperCase()),
         itemResponse.getLevel(),
         bound,
@@ -169,7 +171,7 @@ public class ItemUpdateService {
         item.getId(),
         item.getName(),
         item.getChatLink(),
-        item.getIconId(),
+        item.getIconLink(),
         item.getRarity().name(),
         item.getLevel(),
         item.getBound(),
@@ -181,6 +183,7 @@ public class ItemUpdateService {
     Optional.ofNullable(item.getItemUpgrades())
         .stream()
         .flatMap(Collection::stream)
+        .filter(x -> x != null)
         .forEach(upgrade -> {
           itemDao.createOrNothingUpgrade(item.getId(), upgrade);
         });
@@ -188,6 +191,7 @@ public class ItemUpdateService {
     Optional.ofNullable(item.getItemInfusions())
         .stream()
         .flatMap(Collection::stream)
+        .filter(x -> x != null)
         .forEach(infusion -> {
           itemDao.createOrNothingInfusion(item.getId(), infusion);
         });

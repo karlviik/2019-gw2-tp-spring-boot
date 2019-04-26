@@ -7,7 +7,7 @@ public class Item {
   private Integer id;
   private String name;
   private String chatLink;
-  private Integer iconId; // not 100% sure this ID is always an integer, probably is though
+  private String iconLink; // not 100% sure this ID is always an integer, probably is though
   private ItemRarity rarity;
   private Integer level;
   private Boolean bound; // true if flags have either acc bound or souldbound on aquire
@@ -26,7 +26,7 @@ public class Item {
       Integer id,
       String name,
       String chatLink,
-      Integer iconId,
+      String iconLink,
       ItemRarity rarity,
       Integer level,
       Boolean bound,
@@ -40,7 +40,7 @@ public class Item {
     this.id = id;
     this.name = name;
     this.chatLink = chatLink;
-    this.iconId = iconId;
+    this.iconLink = iconLink;
     this.rarity = rarity;
     this.level = level;
     this.bound = bound;
@@ -64,8 +64,8 @@ public class Item {
     return chatLink;
   }
 
-  public Integer getIconId() {
-    return iconId;
+  public String getIconLink() {
+    return iconLink;
   }
 
   public ItemRarity getRarity() {

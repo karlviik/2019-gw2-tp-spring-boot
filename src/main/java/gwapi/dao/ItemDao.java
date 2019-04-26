@@ -11,7 +11,7 @@ public class ItemDao extends JdbcDao {
       Integer id,
       String name,
       String chatLink,
-      Integer iconId,
+      String iconLink,
       String rarity,
       Integer level,
       Boolean bound,
@@ -21,11 +21,11 @@ public class ItemDao extends JdbcDao {
       String subSubType
   ) {
     update(
-        "INSERT INTO item(id, name, chat_link, icon_id, rarity, level, bound, vendor_value, type, sub_type, sub_sub_type) " +
+        "INSERT INTO item(id, name, chat_link, icon_link, rarity, level, bound, vendor_value, type, sub_type, sub_sub_type) " +
             "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
             "ON CONFLICT (id) DO UPDATE " +
-            "SET name=?, chat_link=?, icon_id=?, rarity=?, level=?, bound=?, vendor_value=?, type=?, sub_type=?, sub_sub_type=?",
-        id, name, chatLink, iconId, rarity, level, bound, vendorValue, type, subType, subSubType, name, chatLink, iconId, rarity, level, bound, vendorValue, type, subType, subSubType);
+            "SET name=?, chat_link=?, icon_link=?, rarity=?, level=?, bound=?, vendor_value=?, type=?, sub_type=?, sub_sub_type=?",
+        id, name, chatLink, iconLink, rarity, level, bound, vendorValue, type, subType, subSubType, name, chatLink, iconLink, rarity, level, bound, vendorValue, type, subType, subSubType);
   }
 
   public void createOrNothingUpgrade(Integer itemId, Integer upgradeItemId) {

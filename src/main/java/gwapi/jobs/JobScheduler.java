@@ -2,6 +2,7 @@ package gwapi.jobs;
 
 import gwapi.dao.GameVersionDao;
 import gwapi.service.ItemUpdateService;
+import gwapi.service.PriceUpdateService;
 import gwapi.service.RecipeUpdateService;
 import gwapi.web.apiresponse.BuildApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,10 @@ public class JobScheduler {
   @Autowired
   private RecipeUpdateService recipeUpdateService;
 
+  @Autowired
+  private PriceUpdateService priceUpdateService;
+
+  @Scheduled(fixedDelay = 1800000)
   public void versionCheckAndTrigger() {
     ResponseEntity<BuildApiResponse> build = restTemplate.exchange(
         "https://api.guildwars2.com/v2/build",
@@ -48,9 +53,9 @@ public class JobScheduler {
     }
   }
 
-  @Scheduled(fixedDelay = 60000)
-  public void versionCheck() {
-    System.out.println("updating");
+  @Scheduled(fixedDelay =60000)
+  public void priceUpdate() {
+    priceUpdateService.updatePrices();
   }
 }
 
