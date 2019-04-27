@@ -2,8 +2,6 @@ package gwapi.dao;
 
 import gwapi.entity.Item;
 import gwapi.entity.ItemRarity;
-import gwapi.entity.ItemSubSubType;
-import gwapi.entity.ItemSubType;
 import gwapi.entity.ItemType;
 import org.springframework.stereotype.Component;
 

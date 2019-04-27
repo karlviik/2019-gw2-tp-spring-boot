@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -157,12 +156,6 @@ public class RecipeDao extends JdbcDao {
         "  FROM recipe r " +
         "  JOIN recipe_component rc ON r.out_item_id = rc.component_item_id " +
         "  WHERE r.calculation_level = ?)", level + 1, level) > 0;
-  }
-
-  public HashSet<Integer> getAllOutIds() {
-    return list("SELECT out_item_id FROM recipe").stream()
-        .map(x -> x.getInteger("out_item_id"))
-        .collect(Collectors.toCollection(HashSet::new));
   }
 
   private RecipeComponent mapComponent(DbRow row) {

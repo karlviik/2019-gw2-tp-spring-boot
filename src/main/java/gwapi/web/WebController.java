@@ -4,17 +4,12 @@ import gwapi.dao.ItemDao;
 import gwapi.dao.PriceDao;
 import gwapi.entity.Item;
 import gwapi.entity.Price;
-import gwapi.service.ItemUpdateService;
-import gwapi.service.PriceUpdateService;
-import gwapi.service.RecipeUpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,19 +18,7 @@ import java.util.Optional;
 
 
 @Controller
-public class ApiPullController {
-
-  @Autowired
-  private RestTemplate restTemplate;
-
-  @Autowired
-  private PriceUpdateService priceUpdateService;
-
-  @Autowired
-  private RecipeUpdateService recipeUpdateService;
-
-  @Autowired
-  private ItemUpdateService itemUpdateService;
+public class WebController {
 
   @Autowired
   private ItemDao itemDao;
@@ -73,9 +56,7 @@ public class ApiPullController {
 
     ArrayList<ArrayList> allPrices = new ArrayList<>();
     for (Price price : prices) {
-//      long time = Timestamp.valueOf(price.getTime()).getTime();
       LocalDateTime time = price.getTime();
-//      Timestamp time = Timestamp.valueOf(price.getTime());
 
       allPrices.add(new ArrayList<Object>(Arrays.asList(
           time,
@@ -91,13 +72,4 @@ public class ApiPullController {
     model.addAttribute("inData", allPrices);
     return "item";
   }
-
-//  @RequestMapping("/update")
-//  public void update() {
-//    itemUpdateService.updateAllItems();
-//    System.out.println("updated all items");
-//    recipeUpdateService.updateAllRecipes();
-//    System.out.println("updated all recipes");
-//  }
-
 }
