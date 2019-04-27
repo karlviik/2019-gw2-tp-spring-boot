@@ -142,8 +142,7 @@ public class RecipeDao extends JdbcDao {
             "FROM recipe " +
             "WHERE calculation_level=? AND updated_at IS NULL",
         (rs, i) -> mapRecipe(rs, components),
-        level
-    );
+        level);
   }
 
   public void resetCalculationLevel() {
