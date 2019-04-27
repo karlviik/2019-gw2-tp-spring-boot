@@ -8,26 +8,26 @@ xmlns:th="http://www.thymeleaf.org">
 
 	<style type="text/css">
 		#item_info {
-		font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-		border-collapse: collapse;
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
 		}
 
 		#item_info td, #item_info th {
-		border: 1px solid #ddd;
-		padding: 12px;
-		text-align: right;
-		width: fit-content;
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: right;
+            width: fit-content;
 		}
 
 		#item_info td {
-		padding-right: 20px;
-		padding-left: 10px;
-		min-width: 150px;
+            padding-right: 20px;
+            padding-left: 10px;
+            min-width: 150px;
 		}
 
 		#item_info th {
-		padding-right: 20px;
-		padding-left: 50px;
+            padding-right: 20px;
+            padding-left: 50px;
 		}
 
 		#item_info tr:nth-child(even){background-color: #f2f2f2;}
@@ -35,13 +35,52 @@ xmlns:th="http://www.thymeleaf.org">
 		#item_info tr:hover {background-color: #ddd;}
 
 		img.item_icon {
-		border-radius: 20%;
+            border-radius: 20%;
 		}
 
 		#item_name p {
-		font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-		font-size: 25pt;
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            font-size: 25pt;
 		}
+
+        .copper {
+            color: #d47f46;
+            font-weight: 700
+        }
+
+        .silver {
+            color: #787878;
+            font-weight: 700
+        }
+
+        .gold {
+            color: #e68a00;
+            font-weight: 700
+        }
+
+        .copper_coin,
+        .silver_coin,
+        .gold_coin {
+            height: 16px;
+            width: 16px;
+            background-repeat: no-repeat;
+            display: inline-block;
+            vertical-align: text-top;
+            margin-top: 1px;
+            margin-left: 3px;
+        }
+
+        .copper_coin {
+            background-image: url(/img/copper_coin.png)
+        }
+
+        .silver_coin {
+            background-image: url(/img/silver_coin.png)
+        }
+
+        .gold_coin {
+            background-image: url(/img/gold_coin.png)
+        }
 	</style>
 </head>
 <body>
@@ -105,6 +144,21 @@ xmlns:th="http://www.thymeleaf.org">
 		return output;
 	};
 
+	currencyFormat = function(coins) {
+	    var copper = Math.floor(coins) % 100;
+	    var silver = Math.floor(coins / 100) % 100;
+	    var gold = Math.floor(coins / 10000);
+	    var formattedCoins = [];
+        if (gold) {
+            formattedCoins.push('<span class="gold">' + gold + '</span><i class="gold_coin"></i>');
+        }
+        if (silver || gold) {
+            formattedCoins.push('<span class="silver">' + silver + '</span><i class="silver_coin"></i>');
+        }
+        formattedCoins.push('<span class="copper">' + copper + '</span><i class="copper_coin"></i>');
+        return formattedCoins.join(' ');
+    };
+
 	var buyPrice = getData(inData, 1);
 	var buyQuantity = getData(inData, 2);
 	var sellPrice = getData(inData, 3);
@@ -159,42 +213,47 @@ xmlns:th="http://www.thymeleaf.org">
 			shared: true,
 			split: false,
 			useHTML: true,
-			headerFormat: '<small>{point.key}</small><table>',
-			pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
-					'<td style="text-align: right"><b>{point.y}</b></td></tr>',
-			footerFormat: '</table>',
+            // taken from gw2tp.com
+            formatter: function() {
+                var p = this.points[0];
+                var output = ['<small>', moment(p.x).format('llll'), '</small><table>'];
+                $.each(this.points, function(i, point) {
+                    var series = point.series;
+                    var isCoins = series.options.currency == 'coins';
+                    var align = isCoins ? '' : 'text-align:left;';
+                    var y;
+                    var yRaw = point.y.toFixed(0);
+                    y = isCoins ? currencyFormat(yRaw) : Highcharts.numberFormat(yRaw, 0);
+                    output.push('<tr><td style="color:' + series.color + '">' + series.name + '</td> <td style="' + align + '"><b>' + y + '</b></td></tr>');
+                });
+                output.push('</table>');
+                return output.join('');
+            },
 			valueDecimals: 0,
 			dateTimeLabelFormats: {
-				millisecond: '%A, %b %e, %H:%M',
-				second: '%H:%M:%S',
-				minute: '%H:%M',
-				hour: '%H:%M',
-				day: '%e. %b',
-				week: '%e. %b',
-				month: '%b \'%y',
-				year: '%Y'
+				millisecond: '%A, %b %e, %H:%M'
 			}
 		},
 
 		series: [{
 			name: "TP Sell",
 			data: sellPrice,
-			// currency: aaa,
+			currency: 'coins',
 			yAxis: 0
 		}, {
 			name: "TP Buy",
 			data: buyPrice,
-			// currency: aaa,
+			currency: 'coins',
 			yAxis: 0
 		}, {
 			name: "Craft Sell",
 			data: sellCraft,
-			// currency: aaa,
+            currency: 'coins',
 			yAxis: 0
 		}, {
 			name: "Craft Buy",
 			data: buyCraft,
-			// currency: aaa,
+            currency: 'coins',
 			yAxis: 0
 		}, {
 			name: "Supply",
@@ -205,13 +264,18 @@ xmlns:th="http://www.thymeleaf.org">
 			data: buyQuantity,
 			yAxis: 1,
 			visible: false
-		}],
+		}
+		],
 
 		yAxis: [{
 			labels: {
 				align: 'right',
-				x: -3
-			},
+				x: -3,
+                useHTML: true,
+                formatter: function() {
+                    return currencyFormat(this.value);
+                }
+            },
 			title: {
 				text: 'Price'
 			},
