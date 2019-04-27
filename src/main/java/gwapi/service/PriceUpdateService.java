@@ -40,7 +40,9 @@ public class PriceUpdateService {
   public void updatePrices() {
     LocalDateTime time = LocalDateTime.now(UTC);
     getTradePostPricePoints(time);
+    System.out.println("updated all tp prices");
     getCraftPricePoints(time);
+    System.out.println("updated all craft prices");
   }
 
   private void getCraftPricePoints(LocalDateTime time) {
@@ -93,23 +95,23 @@ public class PriceUpdateService {
   private void getTradePostPricePoints(LocalDateTime time) {
 
     ResponseEntity<IdListApiResponse> idCount = restTemplate.exchange(
-        "https://api.guildwars2.com/v2/commerce/prices",
-        HttpMethod.GET,
-        null,
-        IdListApiResponse.class);
+      "https://api.guildwars2.com/v2/commerce/prices",
+      HttpMethod.GET,
+      null,
+      IdListApiResponse.class);
     int pageAmount = (int) Math.ceil(idCount.getBody().size() / 200.0);
 
     for (int i = 0; i < pageAmount; i++) {
       ResponseEntity<PricePageApiResponse> result = restTemplate.exchange(
-          "https://api.guildwars2.com/v2/commerce/prices?page_size=200&page=" + i,
-          HttpMethod.GET,
-          null,
-          PricePageApiResponse.class);
+        "https://api.guildwars2.com/v2/commerce/prices?page_size=200&page=" + i,
+        HttpMethod.GET,
+        null,
+        PricePageApiResponse.class);
 
       result.getBody()
-          .stream()
-          .map(priceResponse -> map(priceResponse, time))
-          .forEach(this::addCurrentTradePostPriceToDatabase);
+        .stream()
+        .map(priceResponse -> map(priceResponse, time))
+        .forEach(this::addCurrentTradePostPriceToDatabase);
     }
 
   }
@@ -118,21 +120,21 @@ public class PriceUpdateService {
 
   private Price map(PricePageApiResponse.PriceResponse priceResponse, LocalDateTime time) {
     return new Price(
-        priceResponse.getId(),
-        time,
-        priceResponse.getBuys().getUnitPrice(),
-        priceResponse.getBuys().getQuantity(),
-        priceResponse.getSells().getUnitPrice(),
-        priceResponse.getSells().getQuantity());
+      priceResponse.getId(),
+      time,
+      priceResponse.getBuys().getUnitPrice(),
+      priceResponse.getBuys().getQuantity(),
+      priceResponse.getSells().getUnitPrice(),
+      priceResponse.getSells().getQuantity());
   }
 
   private void addCurrentTradePostPriceToDatabase(Price price) {
     priceDao.addTradePostData(
-        price.getId(),
-        Timestamp.valueOf(price.getTime()),
-        price.getBuyPrice(),
-        price.getBuyQuantity(),
-        price.getSellPrice(),
-        price.getSellQuantity());
+      price.getId(),
+      Timestamp.valueOf(price.getTime()),
+      price.getBuyPrice(),
+      price.getBuyQuantity(),
+      price.getSellPrice(),
+      price.getSellQuantity());
   }
 }
