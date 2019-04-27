@@ -4,8 +4,7 @@ xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!--TITLE VARIABLE HERE-->
-	<title>Example example example</title>
+	<title th:text="${name}"></title>
 
 	<style type="text/css">
 		#item_info {
@@ -53,20 +52,13 @@ xmlns:th="http://www.thymeleaf.org">
 <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
 <script src="https://code.highcharts.com/stock/indicators/volume-by-price.js"></script>
 <script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+
 
 <div id="item_name">
 <p><img th:src="${icon}" alt="item icon" class="item_icon" /> <b th:text="${name}"></b></p>
 </div>
-<!--TABE VARIABLE HERE-->
 <table id="item_info">
-<!--<tr>-->
-<!--<th>Buy</th>-->
-<!--<td>BUY VARIABLE HERE</td>-->
-<!--</tr>-->
-<!--<tr>-->
-<!--<th>Sell</th>-->
-<!--<td>SELL VARIABLE HERE</td>-->
-<!--</tr>-->
 	<tr>
 		<th>ID</th>
 		<td th:text="${id}"></td>
@@ -96,129 +88,166 @@ xmlns:th="http://www.thymeleaf.org">
 		<td th:text="${vendor}"></td>
 	</tr>
 </table>
-<div id="container" style="height: 700px; min-width: 310px"></div>
+<div id="container" style="height: 600px; min-width: 310px"></div>
 
 <script type="text/javascript" th:inline="javascript">
 	/*<![CDATA[*/
 
-	var inData = /*[[${inData}]]*/ 'temp';
+	var inData = /*[[${inData}]]*/ [[]];
 
 	/*]]>*/
-	$.getJSON('https://www.highcharts.com/samples/data/aapl-c.json', function (data) {
-		// Create the chart
-		Highcharts.stockChart('container', {
 
-
-			rangeSelector: {
-				buttons: [{
-					type: 'hour',
-					count: 1,
-					text: '1h'
-				}, {
-					type: 'hour',
-					count: 6,
-					text: '6h'
-				}, {
-					type: 'day',
-					count: 1,
-					text: '1d'
-				}, {
-					type: 'day',
-					count: 3,
-					text: '3d'
-				}, {
-					type: 'week',
-					count: 1,
-					text: '1w'
-				}, {
-					type: 'month',
-					count: 1,
-					text: '1m'
-				}, {
-					type: 'month',
-					count: 6,
-					text: '6m'
-				}, {
-					type: 'year',
-					count: 1,
-					text: '1y'
-				}, {
-					type: 'all',
-					text: 'All'
-				}],
-				selected: 6
-			},
-
-			title: {
-				text: 'Testing ground'
-			},
-
-			tooltip: {
-				shared: true,
-				split: false,
-				useHTML: true,
-				headerFormat: '<small>{point.key}</small><table>',
-				pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
-						'<td style="text-align: right"><b>{point.y}</b></td></tr>',
-				footerFormat: '</table>',
-				valueDecimals: 0
-			},
-
-
-			series: [{
-				name: "Sell",
-				data: data,
-				// currency: aaa,
-				yAxis: 0
-			}, {
-				name: "Buy",
-				data: data,
-				// currency: aaa,
-				yAxis: 0
-			}, {
-				name: "Supply",
-				data: data,
-				yAxis: 1
-			}, {
-				name: "Demand",
-				data: data,
-				yAxis: 1,
-				visible: false
-			}
-			],
-
-			yAxis: [{
-				labels: {
-					align: 'right',
-					x: -3
-				},
-				title: {
-					text: 'Price'
-				},
-				startOnTick: false,
-				endOnTick: false,
-				height: '60%',
-				resize: {
-					enabled: true
-				}
-			}, {
-				title: {
-					text: 'Volume'
-				},
-				top: '65%',
-				height: '35%',
-				offset: 0
-			}],
-
-			legend: {
-				enabled: true,
-				verticalAlign: 'bottom'
-			},
-			scrollbar: {
-				enabled: true,
-				liveRedraw: true
-			}
+	getData = function(data, index) {
+		var output = [];
+		$.each(data, function(a,b){
+			output.push([moment.utc(b[0]).valueOf(),b[index]]);
 		});
+		return output;
+	};
+
+	var buyPrice = getData(inData, 1);
+	var buyQuantity = getData(inData, 2);
+	var sellPrice = getData(inData, 3);
+	var sellQuantity = getData(inData, 4);
+	var buyCraft = getData(inData, 5);
+	var sellCraft = getData(inData, 6);
+
+	Highcharts.stockChart('container', {
+
+
+		rangeSelector: {
+			buttons: [{
+				type: 'hour',
+				count: 1,
+				text: '1h'
+			}, {
+				type: 'hour',
+				count: 6,
+				text: '6h'
+			}, {
+				type: 'day',
+				count: 1,
+				text: '1d'
+			}, {
+				type: 'day',
+				count: 3,
+				text: '3d'
+			}, {
+				type: 'week',
+				count: 1,
+				text: '1w'
+			}, {
+				type: 'month',
+				count: 1,
+				text: '1m'
+			}, {
+				type: 'month',
+				count: 6,
+				text: '6m'
+			}, {
+				type: 'year',
+				count: 1,
+				text: '1y'
+			}, {
+				type: 'all',
+				text: 'All'
+			}],
+			selected: 6
+		},
+
+		tooltip: {
+			shared: true,
+			split: false,
+			useHTML: true,
+			headerFormat: '<small>{point.key}</small><table>',
+			pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
+					'<td style="text-align: right"><b>{point.y}</b></td></tr>',
+			footerFormat: '</table>',
+			valueDecimals: 0,
+			dateTimeLabelFormats: {
+				millisecond: '%A, %b %e, %H:%M',
+				second: '%H:%M:%S',
+				minute: '%H:%M',
+				hour: '%H:%M',
+				day: '%e. %b',
+				week: '%e. %b',
+				month: '%b \'%y',
+				year: '%Y'
+			}
+		},
+
+		series: [{
+			name: "TP Sell",
+			data: sellPrice,
+			// currency: aaa,
+			yAxis: 0
+		}, {
+			name: "TP Buy",
+			data: buyPrice,
+			// currency: aaa,
+			yAxis: 0
+		}, {
+			name: "Craft Sell",
+			data: sellCraft,
+			// currency: aaa,
+			yAxis: 0
+		}, {
+			name: "Craft Buy",
+			data: buyCraft,
+			// currency: aaa,
+			yAxis: 0
+		}, {
+			name: "Supply",
+			data: sellQuantity,
+			yAxis: 1
+		}, {
+			name: "Demand",
+			data: buyQuantity,
+			yAxis: 1,
+			visible: false
+		}],
+
+		yAxis: [{
+			labels: {
+				align: 'right',
+				x: -3
+			},
+			title: {
+				text: 'Price'
+			},
+			startOnTick: false,
+			endOnTick: false,
+			height: '60%',
+			resize: {
+				enabled: true
+			}
+		}, {
+			title: {
+				text: 'Volume'
+			},
+			top: '75%',
+			height: '25%',
+			offset: 0
+		}],
+
+		xAxis: {
+			type: 'datetime',
+			ordinal: false
+		},
+
+		legend: {
+			enabled: true,
+			verticalAlign: 'bottom'
+		},
+
+		scrollbar: {
+			enabled: true,
+			liveRedraw: true
+		},
+
+		time: {
+			useUTC: false
+		}
 	});
 
 </script>
