@@ -35,6 +35,17 @@ public class Price {
     this.craftSellPrice = craftSellPrice;
   }
 
+  public Price(int id, LocalDateTime time, Integer buyPrice, Integer buyQuantity, Integer sellPrice, Integer sellQuantity, Integer craftBuyPrice, Integer craftSellPrice) {
+    this.id = id;
+    this.time = time;
+    this.buyPrice = buyPrice;
+    this.buyQuantity = buyQuantity;
+    this.sellPrice = sellPrice;
+    this.sellQuantity = sellQuantity;
+    this.craftBuyPrice = craftBuyPrice;
+    this.craftSellPrice = craftSellPrice;
+  }
+
   public int getId() {
     return id;
   }
