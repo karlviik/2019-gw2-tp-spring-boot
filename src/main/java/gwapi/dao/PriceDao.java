@@ -48,13 +48,35 @@ public class PriceDao extends JdbcDao {
         itemId, Timestamp.valueOf(time));
   }
 
+  public List<Price> getPrices(Integer itemId) {
+    return list(
+        "SELECT * " +
+            "FROM price " +
+            "WHERE item_id=?",
+        this::mapPrice,
+        itemId);
+  }
+
   private Price mapTradePostAndCraftPrice(ResultSet row, int i) throws SQLException {
     return new Price(
         row.getInt("item_id"),
-        row.getInt("buy_price"),
-        row.getInt("sell_price"),
-        row.getInt("craft_buy_price"),
-        row.getInt("craft_sell_price")
+        row.getObject("buy_price", Integer.class),
+        row.getObject("sell_price", Integer.class),
+        row.getObject("craft_buy_price", Integer.class),
+        row.getObject("craft_sell_price", Integer.class)
+    );
+  }
+
+  private Price mapPrice(ResultSet row, int i) throws SQLException {
+    return new Price(
+        row.getInt("item_id"),
+        row.getObject("created_at", LocalDateTime.class),
+        row.getObject("buy_price", Integer.class),
+        row.getObject("buy_quantity", Integer.class),
+        row.getObject("sell_price", Integer.class),
+        row.getObject("sell_quantity", Integer.class),
+        row.getObject("craft_buy_price", Integer.class),
+        row.getObject("craft_sell_price", Integer.class)
     );
   }
 }
