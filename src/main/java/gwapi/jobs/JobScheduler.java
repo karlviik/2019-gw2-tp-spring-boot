@@ -32,30 +32,32 @@ public class JobScheduler {
 
   @Scheduled(fixedDelay = 1800000)
   public void versionCheckAndTrigger() {
+    System.out.println("Started updating items.");
     ResponseEntity<BuildApiResponse> build = restTemplate.exchange(
         "https://api.guildwars2.com/v2/build",
         HttpMethod.GET,
         null,
         BuildApiResponse.class);
     Integer currentVersion = build.getBody().getId();
-    if (versionDao.getVersion() != currentVersion) {
+    if (!versionDao.getVersion().equals(currentVersion)) {
+      System.out.println("New version, started updating everything");
       versionDao.setVersion(currentVersion);
       itemUpdateService.updateAllItems();
       recipeUpdateService.updateAllRecipes();
-      // this means new build has happened, need to trigger
-      // a database wide check for recipe and item changes
-      // that also includes adding new items
     }
     else {
-      // here just checking for new items should happen
+      System.out.println("Same version, checking for new items");
       itemUpdateService.addNewItems();
       recipeUpdateService.addNewRecipes();
     }
+    System.out.println("Finished updating items");
   }
 
-  @Scheduled(fixedDelay =60000)
+  @Scheduled(cron = "0 0,15,30,45 * * * ?")
   public void priceUpdate() {
+    System.out.println("Started price updating.");
     priceUpdateService.updatePrices();
+    System.out.println("Finished price updating.");
   }
 }
 
