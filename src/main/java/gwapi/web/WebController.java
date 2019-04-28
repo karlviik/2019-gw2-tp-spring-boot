@@ -7,8 +7,8 @@ import gwapi.entity.Price;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,8 +26,9 @@ public class WebController {
   @Autowired
   private PriceDao priceDao;
 
-  @GetMapping("/item")
-  public String item(Model model, @RequestParam(value="id", required=false, defaultValue="84") String idString) {
+  @RequestMapping("/item/{idString}")
+  public String item(Model model, @PathVariable String idString) {
+    System.out.println("Requested item: " + idString);
     Integer id;
     try {
       id = Integer.parseInt(idString);
@@ -39,7 +40,7 @@ public class WebController {
       return "404";
     }
     Item item = optionalItem.get();
-    // add variables into html
+
     model.addAttribute("name", item.getName());
     model.addAttribute("id", id);
     model.addAttribute("level", item.getLevel().toString());
@@ -49,10 +50,8 @@ public class WebController {
     model.addAttribute("bound", item.getBound().toString());
     model.addAttribute("vendor", item.getVendorValue().toString());
     model.addAttribute("icon", item.getIconLink());
-    // get all price points for id
-    List<Price> prices = priceDao.getPrices(id);
 
-    System.out.println(prices.size());
+    List<Price> prices = priceDao.getPrices(id);
 
     ArrayList<ArrayList> allPrices = new ArrayList<>();
     for (Price price : prices) {
@@ -68,7 +67,6 @@ public class WebController {
           price.getCraftSellPrice()
       )));
     }
-    System.out.println(allPrices);
     model.addAttribute("inData", allPrices);
     return "item";
   }
