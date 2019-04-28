@@ -40,9 +40,9 @@ public class PriceUpdateService {
   public void updatePrices() {
     LocalDateTime time = LocalDateTime.now(UTC);
     getTradePostPricePoints(time);
-    System.out.println("updated all tp prices");
+    System.out.println("Updated all TP prices");
     getCraftPricePoints(time);
-    System.out.println("updated all craft prices");
+    System.out.println("Updated all craft prices");
   }
 
   private void getCraftPricePoints(LocalDateTime time) {
