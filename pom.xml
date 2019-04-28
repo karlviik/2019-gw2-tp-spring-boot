@@ -8,10 +8,10 @@
 		<version>2.1.3.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>gw2api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>gw2api</name>
+	<groupId>com.sutgon</groupId>
+	<artifactId>gw2</artifactId>
+	<version>0.0.1</version>
+	<name>gw2</name>
 	<description>GW2api project for Spring Boot</description>
 
 	<properties>
