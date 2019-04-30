@@ -6,7 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import gwapi.web.apiresponse.RecipePageApiResponse.RecipeResponse;
 
-// example: https://api.guildwars2.com/v2/recipes?page_size=200&page=60
+/**
+ * API Json structure for /prices?page_size=x endpoint
+ *
+ * example: https://api.guildwars2.com/v2/recipes?page_size=200&page=60
+ */
 public class RecipePageApiResponse extends ArrayList<RecipeResponse> {
 
   public static class RecipeResponse {

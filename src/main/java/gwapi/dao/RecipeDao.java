@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.isEqual;
 
+// TODO: refactor
 @Component
 public class RecipeDao extends JdbcDao {
 

@@ -2,7 +2,7 @@ package gwapi.entity;
 
 /**
  * Includes all possibilities for item second types in one pot. Probably not a good idea.
- * None for empty type, new for new type not yet in here.
+ * None for empty type (not used), new for new type not yet in here.
  */
 public enum ItemSubType {
   NONE,

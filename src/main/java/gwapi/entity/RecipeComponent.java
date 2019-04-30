@@ -2,6 +2,9 @@ package gwapi.entity;
 
 import java.util.Objects;
 
+/**
+ * Recipe component class for holding components required for a recipe (duh)
+ */
 public class RecipeComponent {
   private final int id;
   private final int count;

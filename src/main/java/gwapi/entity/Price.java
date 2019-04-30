@@ -2,6 +2,9 @@ package gwapi.entity;
 
 import java.time.LocalDateTime;
 
+/**
+ * Price class for holding pricepoints, subject to change in the future.
+ */
 public class Price {
 
   private int id;

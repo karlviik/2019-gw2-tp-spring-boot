@@ -21,6 +21,7 @@ import java.util.*;
 
 import static java.time.ZoneOffset.UTC;
 
+// TODO: fix it all
 /**
  * Should just have one method that gets the prices and inserts them into the database, maybe make scheduler get the
  * timestamp and feed it to the updater and then feed the same thing to recipe cprice calculator service

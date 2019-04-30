@@ -2,6 +2,9 @@ package gwapi.entity;
 
 import java.util.List;
 
+/**
+ * Item object for holding items
+ */
 public class Item {
 
   private Integer id;

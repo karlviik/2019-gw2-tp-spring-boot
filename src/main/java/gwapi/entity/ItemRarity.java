@@ -2,7 +2,7 @@ package gwapi.entity;
 
 /**
  * Includes all possible item rarity types.
- * NONE for if it's empty
+ * NONE for if it's empty (shouldn't be used)
  * NEW for if it's new
  * right one otherwise
  */

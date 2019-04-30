@@ -2,6 +2,10 @@ package gwapi.web.apiresponse;
 
 import java.util.ArrayList;
 
-// example: https://api.guildwars2.com/v2/items
+/**
+ * API Json structure for /items or /recipes endpoint
+ *
+ * example: https://api.guildwars2.com/v2/items
+ */
 public class IdListApiResponse extends ArrayList<Integer> {
 }

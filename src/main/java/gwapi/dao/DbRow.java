@@ -10,7 +10,7 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 /**
  * A more-nice-to-work-with-substitute for regular {@link Map} returned by {@link ColumnMapRowMapper}.
  *
- * Courtesy of Henri Viik.
+ * @author Henri Viik.
  */
 public class DbRow extends LinkedCaseInsensitiveMap<Object> {
 

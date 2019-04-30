@@ -6,7 +6,11 @@ import java.util.ArrayList;
 
 import gwapi.web.apiresponse.PricePageApiResponse.PriceResponse;
 
-// example: https://api.guildwars2.com/v2/commerce/prices?page_size=200&page=125
+/**
+ * API Json structure for /prices?page_size=x endpoint
+ *
+ * example: https://api.guildwars2.com/v2/prices?page_size=200&page=125
+ */
 public class PricePageApiResponse extends ArrayList<PriceResponse> {
 
   public static class PriceResponse {

@@ -2,7 +2,6 @@ package gwapi.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Description;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -10,11 +9,13 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+/**
+ * Thymeleaf configuration.
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
   @Bean
-  @Description("Thymeleaf template resolver serving HTML 5")
   public ClassLoaderTemplateResolver templateResolver() {
 
     var templateResolver = new ClassLoaderTemplateResolver();
@@ -22,14 +23,13 @@ public class WebConfig implements WebMvcConfigurer {
     templateResolver.setPrefix("templates/");
     templateResolver.setCacheable(false);
     templateResolver.setSuffix(".html");
-    templateResolver.setTemplateMode("HTML5");
+    templateResolver.setTemplateMode("HTML");
     templateResolver.setCharacterEncoding("UTF-8");
 
     return templateResolver;
   }
 
   @Bean
-  @Description("Thymeleaf template engine with Spring integration")
   public SpringTemplateEngine templateEngine() {
 
     var templateEngine = new SpringTemplateEngine();
@@ -39,7 +39,6 @@ public class WebConfig implements WebMvcConfigurer {
   }
 
   @Bean
-  @Description("Thymeleaf view resolver")
   public ViewResolver viewResolver() {
 
     var viewResolver = new ThymeleafViewResolver();
@@ -52,8 +51,7 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
-    registry.addViewController("/").setViewName("item");
-    registry.addViewController("/test").setViewName("test");
+    registry.addViewController("/").setViewName("index");
   }
 }
 

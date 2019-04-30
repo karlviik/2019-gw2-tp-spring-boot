@@ -16,7 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.time.ZoneOffset.UTC;
@@ -31,30 +33,37 @@ public class RecipeUpdateService {
   private RecipeDao recipeDao;
 
   /**
-   * @return false if no recipes added, true otherwise
+   * Get all recipe IDs from api and add those to database that aren't there.
    */
   public void addNewRecipes() {
     ResponseEntity<IdListApiResponse> allApiRecipeIdsResponse = restTemplate.exchange(
         "https://api.guildwars2.com/v2/recipes",
         HttpMethod.GET,
         null,
-        IdListApiResponse.class
-    );
+        IdListApiResponse.class);
 
     List<Integer> apiRecipeIds = allApiRecipeIdsResponse.getBody();
-    List<Integer> databaseRecipeIds = recipeDao.getAllRecipeIds();
-    for (Integer dbId : databaseRecipeIds) {
-      apiRecipeIds.remove(dbId);
+    Set<Integer> databaseRecipeIdSet = new HashSet<>(recipeDao.getAllRecipeIds());
+    List<Integer> newRecipeIds = new ArrayList<>();
+    if (apiRecipeIds != null) {
+      for (Integer apiId : apiRecipeIds) {
+        if (!databaseRecipeIdSet.contains(apiId)) {
+          newRecipeIds.add(apiId);
+        }
+      }
     }
-    if (apiRecipeIds.size() == 0) {
+    else {
+      return;
+    }
+    if (newRecipeIds.isEmpty()) {
       return;
     }
     for (int i = 0; i < (int) Math.ceil(apiRecipeIds.size() / 200.0); i++) {
       StringBuilder sb = new StringBuilder();
       sb.append("https://api.guildwars2.com/v2/recipes?ids=");
-      int end = Math.min((i + 1) * 200, apiRecipeIds.size());
+      int end = Math.min((i + 1) * 200, newRecipeIds.size());
       for (int j = i * 200; j < end; j++) {
-        sb.append(apiRecipeIds.get(j));
+        sb.append(newRecipeIds.get(j));
         if (j < end - 1) {
           sb.append(",");
         }
@@ -66,14 +75,18 @@ public class RecipeUpdateService {
           null,
           RecipePageApiResponse.class
       );
-
-      recipePageApiResponse.getBody().stream()
-          .map(this::mapRecipe)
-          .forEach(this::addNewRecipeToDatabase);
+      if (recipePageApiResponse.getBody() != null) {
+        recipePageApiResponse.getBody().stream()
+            .map(this::mapRecipe)
+            .forEach(this::addNewRecipeToDatabase);
+      }
     }
     updateRecipeCalculationOrder();
   }
 
+  /**
+   * Update all recipes in the database, every single one.
+   */
   public void updateAllRecipes() {
     LocalDateTime time = LocalDateTime.now(UTC);
 
@@ -82,6 +95,9 @@ public class RecipeUpdateService {
         HttpMethod.GET,
         null,
         IdListApiResponse.class);
+    if (idCount.getBody() == null) {
+      return;
+    }
     int pageAmount = (int) Math.ceil(idCount.getBody().size() / 200.0);
 
     for (int i = 0; i < pageAmount; i++) {
@@ -90,38 +106,44 @@ public class RecipeUpdateService {
           HttpMethod.GET,
           null,
           RecipePageApiResponse.class);
-
-      result.getBody()
-          .stream()
-          .map(this::mapRecipe)
-          .forEach(recipe -> recipeDao.createOrUpdate(recipe, time));
+      if (result.getBody() != null) {
+        result.getBody()
+            .stream()
+            .map(this::mapRecipe)
+            .forEach(recipe -> recipeDao.createOrUpdate(recipe, time));
+      }
     }
     updateRecipeCalculationOrder();
   }
 
+  /**
+   * Add recipe to database.
+   *
+   * @param recipe new recipe to be added
+   */
   private void addNewRecipeToDatabase(Recipe recipe) {
+
     recipeDao.createRecipeIfNew(
         recipe.getRecipeId(),
-        Timestamp.valueOf(recipe.getOverwriteTime()),
+        recipe.getOverwriteTime() == null ? null : Timestamp.valueOf(recipe.getOverwriteTime()),
         recipe.getType().name(),
         recipe.getMinRating(),
         recipe.isLearnedFromItem(),
         recipe.getChatLink(),
         recipe.getOutItemId(),
-        recipe.getOutItemCount()
-    );
+        recipe.getOutItemCount());
+
     for (RecipeDiscipline discipline : recipe.getDisciplines()) {
       recipeDao.addDisciplineOrNothing(
           recipe.getRecipeId(),
-          discipline.name()
-      );
+          discipline.name());
     }
+
     for (RecipeComponent component : recipe.getComponents()) {
       recipeDao.addComponentIfNew(
           recipe.getRecipeId(),
           component.getId(),
-          component.getCount()
-      );
+          component.getCount());
     }
   }
 
@@ -153,6 +175,9 @@ public class RecipeUpdateService {
         components);
   }
 
+  /**
+   * Update the order of calculation for recipes.
+   */
   public void updateRecipeCalculationOrder() {
     recipeDao.resetCalculationLevel();
 

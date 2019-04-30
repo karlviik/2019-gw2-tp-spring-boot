@@ -2,7 +2,7 @@ package gwapi.entity;
 
 /**
  * Includes all types item can have.
- * NONE is used for when type is empty.
+ * NONE is used for when type is empty. (not used)
  * NEW is used for when type exists but is not in this list.
  */
 public enum ItemType {

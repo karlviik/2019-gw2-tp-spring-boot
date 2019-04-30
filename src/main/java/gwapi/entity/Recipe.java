@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Recipe class for holding recipes.
+ */
 public class Recipe {
 
   private Integer recipeId;

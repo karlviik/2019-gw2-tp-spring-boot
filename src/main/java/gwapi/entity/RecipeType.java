@@ -1,5 +1,9 @@
 package gwapi.entity;
 
+/**
+ * Recipe type enum
+ * New is used for items not on this list yet.
+ */
 public enum RecipeType {
   NONE,
   NEW,

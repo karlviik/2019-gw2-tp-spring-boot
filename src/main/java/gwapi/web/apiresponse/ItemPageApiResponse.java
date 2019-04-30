@@ -6,7 +6,11 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gwapi.web.apiresponse.ItemPageApiResponse.ItemResponse;
 
-// example: https://api.guildwars2.com/v2/items?page_size=200&page=275
+/**
+ * API Json structure for /items?page_size=x endpoint
+ *
+ * example: https://api.guildwars2.com/v2/items?page_size=200&page=275
+ */
 public class ItemPageApiResponse extends ArrayList<ItemResponse> {
 
   public static class ItemResponse {

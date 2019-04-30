@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
-
+// TODO: javadoc? Or something?
 @EnableScheduling
 @SpringBootApplication
 public class ApiApplication {

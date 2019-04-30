@@ -26,6 +26,7 @@ import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 
+// TODO: fix it all
 /**
  * Should have 2 methods:
  * a) get all items and update them (like when build changes)
@@ -86,6 +87,7 @@ public class ItemUpdateService {
     }
   }
 
+  // TODO: refactor
   public void updateAllItems() {
 
     ResponseEntity<IdListApiResponse> idCount = restTemplate.exchange(
@@ -109,6 +111,7 @@ public class ItemUpdateService {
     }
   }
 
+  // TODO: refactor a tiny weeny bit
   private Item mapItem(ItemPageApiResponse.ItemResponse itemResponse) {
     boolean bound = itemResponse.getFlags().stream().anyMatch(x -> x.equals("AccountBound") || x.equals("SoulbindOnAcquire"));
 
@@ -166,6 +169,7 @@ public class ItemUpdateService {
         infusions);
   }
 
+  // TODO: fix the nulllls
   private void addItemToDatabase(Item item) {
     itemDao.createOrOverwriteItem(
         item.getId(),

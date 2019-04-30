@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Courtesy of Henri Viik.
+ * @author Henri Viik
  */
 public abstract class JdbcDao {
 

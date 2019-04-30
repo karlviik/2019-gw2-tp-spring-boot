@@ -138,9 +138,16 @@ xmlns:th="http://www.thymeleaf.org">
 
 	getData = function(data, index) {
 		var output = [];
+		var isEmpty = true;
 		$.each(data, function(a,b){
+			if (b[index] != null) {
+				isEmpty = false;
+			}
 			output.push([moment.utc(b[0]).valueOf(),b[index]]);
 		});
+		if (isEmpty) {
+			return [];
+		}
 		return output;
 	};
 
@@ -168,6 +175,21 @@ xmlns:th="http://www.thymeleaf.org">
 
 	Highcharts.stockChart('container', {
 
+		chart: {
+			events: {
+				load: function() {
+					this.series.slice(0, 6).forEach(function(s) {
+						s.update({
+							showInLegend: s.points.length
+						});
+					});
+				}
+			}
+		},
+
+		navigator: {
+			enabled: true,
+		},
 
 		rangeSelector: {
 			buttons: [{
@@ -239,29 +261,40 @@ xmlns:th="http://www.thymeleaf.org">
 			name: "TP Sell",
 			data: sellPrice,
 			currency: 'coins',
+			showInNavigator: true,
+			color: '#ff3d3d',
 			yAxis: 0
 		}, {
 			name: "TP Buy",
 			data: buyPrice,
 			currency: 'coins',
+			showInNavigator: true,
+			color: '#3d40ff',
 			yAxis: 0
 		}, {
 			name: "Craft Sell",
 			data: sellCraft,
             currency: 'coins',
+			showInNavigator: true,
+			color: '#ff9e3d',
 			yAxis: 0
 		}, {
 			name: "Craft Buy",
 			data: buyCraft,
             currency: 'coins',
-			yAxis: 0
+			showInNavigator: true,
+			color: '#3dff40',
+			yAxis: 0,
+			visible: false
 		}, {
 			name: "Supply",
 			data: sellQuantity,
+			color: '#ffd900',
 			yAxis: 1
 		}, {
 			name: "Demand",
 			data: buyQuantity,
+			color: '#b700ff',
 			yAxis: 1,
 			visible: false
 		}
