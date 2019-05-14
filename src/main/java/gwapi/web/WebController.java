@@ -9,14 +9,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-// TODO: see if can clean up
+/**
+ * Controller for responding to web requests
+ */
 @Controller
 public class WebController {
 
@@ -26,6 +31,13 @@ public class WebController {
   @Autowired
   private PriceDao priceDao;
 
+  /**
+   * Item page
+   *
+   * @param model page template
+   * @param idString id of item
+   * @return item page with data
+   */
   @RequestMapping("/item/{idString}")
   public String item(Model model, @PathVariable String idString) {
     System.out.println("Requested item: " + idString);
@@ -69,5 +81,47 @@ public class WebController {
     }
     model.addAttribute("inData", allPrices);
     return "item";
+  }
+
+  /**
+   * Page for searching items.
+   *
+   * @param model page template
+   * @param searchString search string
+   * @return search page with up to 100 results
+   */
+  @RequestMapping("/item")
+  public String itemSearch(Model model, @RequestParam(value = "search", defaultValue = "potato") String searchString) {
+    System.out.println("Searched string: " + searchString);
+    List<Item> searchResults = itemDao.getItemContainingString(searchString);
+    List<List> inList = new ArrayList<>();
+    for (Item item : searchResults) {
+      inList.add(new ArrayList<Object>(Arrays.asList(
+          item.getId(),
+          item.getName(),
+          item.getRarity().toString(),
+          item.getLevel(),
+          item.getChatLink()
+      )));
+    }
+    inList = inList.stream().sorted(Comparator.comparing(x -> (String) x.get(1))).collect(Collectors.toList());
+    model.addAttribute("items", inList);
+    return "itemSearch";
+  }
+
+  /**
+   * @return index page on root
+   */
+  @RequestMapping("/")
+  public String landing() {
+    return "index";
+  }
+
+  /**
+   * @return 404 on unknown url
+   */
+  @RequestMapping("*")
+  public String fallbackMethod(){
+    return "404";
   }
 }
