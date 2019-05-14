@@ -57,6 +57,7 @@ public class JobScheduler {
     else {
       System.out.println("Same version, checking for new items");
       itemUpdateService.addNewItems();
+      System.out.println("Done with items, starting with recipes.");
       recipeUpdateService.addNewRecipes();
     }
     System.out.println("Finished updating items");
