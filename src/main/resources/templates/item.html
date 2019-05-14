@@ -7,6 +7,9 @@ xmlns:th="http://www.thymeleaf.org">
 	<title th:text="${name}"></title>
 
 	<style type="text/css">
+		body {
+			background-color: #dddddd;
+		}
 		#item_info {
             font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
             border-collapse: collapse;
@@ -81,6 +84,10 @@ xmlns:th="http://www.thymeleaf.org">
         .gold_coin {
             background-image: url(/img/gold_coin.png)
         }
+
+		#highcharts-container{
+			width:100% !important;
+		}
 	</style>
 </head>
 <body>
@@ -127,7 +134,7 @@ xmlns:th="http://www.thymeleaf.org">
 		<td th:text="${vendor}"></td>
 	</tr>
 </table>
-<div id="container" style="height: 600px; min-width: 310px"></div>
+<div id="highcharts-container" style="height: 600px; width: 100%"></div>
 
 <script type="text/javascript" th:inline="javascript">
 	/*<![CDATA[*/
@@ -173,7 +180,7 @@ xmlns:th="http://www.thymeleaf.org">
 	var buyCraft = getData(inData, 5);
 	var sellCraft = getData(inData, 6);
 
-	Highcharts.stockChart('container', {
+	Highcharts.stockChart('highcharts-container', {
 
 		chart: {
 			events: {
