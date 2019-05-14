@@ -105,7 +105,24 @@ public class ItemDao extends JdbcDao {
         this::mapItemNoComponents,
         id
     );
+  }
 
+  /**
+   * Get all items with search string in their name
+   *
+   * @param str search string
+   * @return list of items with search string in their name
+   */
+  public List<Item> getItemContainingString(String str) {
+    str = "%" + str + "%";
+    return list(
+        "SELECT * " +
+        "FROM item " +
+        "WHERE LOWER(name) LIKE LOWER(?) " +
+        "LIMIT 100",
+        this::mapItemNoComponents,
+        str
+    );
   }
 
   /**
