@@ -15,9 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -26,16 +28,8 @@ import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 
-// TODO: fix it all
 /**
- * Should have 2 methods:
- * a) get all items and update them (like when build changes)
- * This kinda means that when sub tables have rows removed or edited, then first got to
- * delete current contents related to that item ID and then add the new ones.
- * Could also check if actually got to remove, but that's kinda unnecessary
- * as there are not many listings in those cases.
- * Happens rarely.
- * b) get new items and add them (like when no build change)
+ * Service for pulling items from API and inserting them to database
  */
 @Component
 public class ItemUpdateService {
@@ -46,6 +40,9 @@ public class ItemUpdateService {
   @Autowired
   private ItemDao itemDao;
 
+  /**
+   * Add all items not yet in database to db.
+   */
   public void addNewItems() {
     ResponseEntity<IdListApiResponse> allApiItemIdsResponse = restTemplate.exchange(
         "https://api.guildwars2.com/v2/items",
@@ -54,17 +51,16 @@ public class ItemUpdateService {
         IdListApiResponse.class);
     List<Integer> allApiItemIds = allApiItemIdsResponse.getBody();
     List<Integer> allDatabaseItemIds = itemDao.getItemIds();
-
     HashSet<Integer> uncommonElements = new HashSet<>(allApiItemIds);
     for (Integer b : allDatabaseItemIds) {
       if (!uncommonElements.add(b)) {
         uncommonElements.remove(b);
       }
     }
-    // if there are no new items in api list
     if (uncommonElements.size() == 0) {
       return;
     }
+    allApiItemIds = new ArrayList<>(uncommonElements);
 
     for (int i = 0; i < (int) Math.ceil(allApiItemIds.size() / 200.0); i++) {
       StringBuilder sb = new StringBuilder();
@@ -81,13 +77,16 @@ public class ItemUpdateService {
           HttpMethod.GET,
           null,
           ItemPageApiResponse.class);
+
       itemPageApiResponse.getBody().stream()
           .map(this::mapItem)
           .forEach(this::addItemToDatabase);
     }
   }
 
-  // TODO: refactor
+  /**
+   * Updates all items in API.
+   */
   public void updateAllItems() {
 
     ResponseEntity<IdListApiResponse> idCount = restTemplate.exchange(
@@ -111,16 +110,18 @@ public class ItemUpdateService {
     }
   }
 
-  // TODO: refactor a tiny weeny bit
+  /**
+   * Map api item response to an item object
+   *
+   * @param itemResponse item's api response
+   * @return Item
+   */
   private Item mapItem(ItemPageApiResponse.ItemResponse itemResponse) {
     boolean bound = itemResponse.getFlags().stream().anyMatch(x -> x.equals("AccountBound") || x.equals("SoulbindOnAcquire"));
 
     boolean nullVendor = itemResponse.getFlags().stream().anyMatch(x -> x.equals("NoSell"));
 
-    String iconLink = null;
-    if (itemResponse.getIcon() != null) {
-      iconLink = itemResponse.getIcon();
-    }
+    String iconLink = Optional.ofNullable(itemResponse.getIcon()).orElse(null);
 
     ItemSubType subType = Optional.ofNullable(itemResponse.getDetail())
         .map(Detail::getType)
@@ -169,7 +170,11 @@ public class ItemUpdateService {
         infusions);
   }
 
-  // TODO: fix the nulllls
+  /**
+   * Add item to db
+   *
+   * @param item item obj to be added
+   */
   private void addItemToDatabase(Item item) {
     itemDao.createOrOverwriteItem(
         item.getId(),
@@ -187,7 +192,7 @@ public class ItemUpdateService {
     Optional.ofNullable(item.getItemUpgrades())
         .stream()
         .flatMap(Collection::stream)
-        .filter(x -> x != null)
+        .filter(Objects::nonNull)
         .forEach(upgrade -> {
           itemDao.createOrNothingUpgrade(item.getId(), upgrade);
         });
@@ -195,7 +200,7 @@ public class ItemUpdateService {
     Optional.ofNullable(item.getItemInfusions())
         .stream()
         .flatMap(Collection::stream)
-        .filter(x -> x != null)
+        .filter(Objects::nonNull)
         .forEach(infusion -> {
           itemDao.createOrNothingInfusion(item.getId(), infusion);
         });
