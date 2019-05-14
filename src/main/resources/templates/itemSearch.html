@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Searchy stuff</title>
+    <style type="text/css">
+        body {
+            background-color: #dddddd;
+            font-family: Arial;
+        }
+
+        form.searchbox input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            width: 93%;
+            background: #f1f1f1;
+        }
+
+        table.gridtable {
+            font-family: verdana, arial, sans-serif;
+            font-size: 15px;
+            margin-top: 50px;
+            color: #333333;
+            border-width: 1px;
+            border-color: #666666;
+            border-collapse: collapse;
+        }
+
+        table.gridtable th {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: #666666;
+            background-color: #d0d0d0;
+        }
+
+        table.gridtable td {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: #666666;
+        }
+
+        table.gridtable tr:hover {
+            background-color: #b3e6ff;
+        }
+
+        table.gridtable tr:hover {
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+</head>
+<body>
+<form class="searchbox" action="/item" style="margin:auto;max-width:300px;margin-top:50px">
+    <input type="text" placeholder="Search..." name="search">
+</form>
+<div id="results" align="center"></div>
+
+<script type="text/javascript" th:inline="javascript">
+    // gotten from https://jsfiddle.net/mplungjan/r5v7q1js/
+
+    /*<![CDATA[*/
+
+    var items = /*[[${items}]]*/ [[1, 2, 3, 4, 5], [2, 2, 2, 2, 2]];
+
+    /*]]>*/
+
+    function buildTable(data) {
+        var table = document.createElement("table");
+        table.className = "gridtable";
+        var thead = document.createElement("thead");
+        var tbody = document.createElement("tbody");
+        var headRow = document.createElement("tr");
+        ["id", "Item name", "Rarity", "Level", "Chat link"].forEach(function(el) {
+            var th = document.createElement("th");
+            th.appendChild(document.createTextNode(el));
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+        data.forEach(function(el) {
+            var tr = document.createElement("tr");
+            tr.setAttribute('data-href', 'https://gw2.sutgon.com/item/' + el[0]);
+            for (var o in el) {
+                var td = document.createElement("td");
+                td.appendChild(document.createTextNode(el[o]));
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        return table;
+    }
+    window.onload = function() {
+        if(items) {
+            document.getElementById("results").appendChild(buildTable(items));
+        }
+    }
+</script>
+<script type="text/javascript">
+    jQuery(document).ready(function ($) {
+        $('[data-href]').click(function () {
+            // location.href = $(this).data("href");
+            window.open($(this).data("href"), '_self');
+        });
+    });
+</script>
+</body>
+</html>
