@@ -21,10 +21,8 @@ import java.util.*;
 
 import static java.time.ZoneOffset.UTC;
 
-// TODO: fix it all
 /**
- * Should just have one method that gets the prices and inserts them into the database, maybe make scheduler get the
- * timestamp and feed it to the updater and then feed the same thing to recipe cprice calculator service
+ * Service for getting new pricepoints.
  */
 @Component
 public class PriceUpdateService {
@@ -38,6 +36,9 @@ public class PriceUpdateService {
   @Autowired
   private RecipeDao recipeDao;
 
+  /**
+   * Triggers methods for updating prices.
+   */
   public void updatePrices() {
     LocalDateTime time = LocalDateTime.now(UTC);
     getTradePostPricePoints(time);
@@ -46,6 +47,11 @@ public class PriceUpdateService {
     System.out.println("Updated all craft prices");
   }
 
+  /**
+   * Calculates crafting prices for each item, going level by level.
+   *
+   * @param time time of triggering
+   */
   private void getCraftPricePoints(LocalDateTime time) {
     int level = 1;
     while (true) {
@@ -80,6 +86,13 @@ public class PriceUpdateService {
     }
   }
 
+  /**
+   * Get the smaller of 2, if both are null, returns 0.
+   *
+   * @param a price a
+   * @param b price b
+   * @return minimum price
+   */
   private int customMinPrice(Integer a, Integer b) {
     if (a == null && b == null) {
       return 0;
@@ -93,6 +106,11 @@ public class PriceUpdateService {
     return Math.min(a, b);
   }
 
+  /**
+   * Get all TP price points and add to db.
+   *
+   * @param time time of triggering
+   */
   private void getTradePostPricePoints(LocalDateTime time) {
 
     ResponseEntity<IdListApiResponse> idCount = restTemplate.exchange(
@@ -117,8 +135,13 @@ public class PriceUpdateService {
 
   }
 
-
-
+  /**
+   * Map pricepoint to obj, only tp price fields.
+   *
+   * @param priceResponse api price response
+   * @param time time of initial triggering
+   * @return price object
+   */
   private Price map(PricePageApiResponse.PriceResponse priceResponse, LocalDateTime time) {
     return new Price(
       priceResponse.getId(),
@@ -129,6 +152,11 @@ public class PriceUpdateService {
       priceResponse.getSells().getQuantity());
   }
 
+  /**
+   * Adds TP prices to db.
+   *
+   * @param price obj to be added
+   */
   private void addCurrentTradePostPriceToDatabase(Price price) {
     priceDao.addTradePostData(
       price.getId(),

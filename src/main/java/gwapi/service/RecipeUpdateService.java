@@ -58,7 +58,7 @@ public class RecipeUpdateService {
     if (newRecipeIds.isEmpty()) {
       return;
     }
-    for (int i = 0; i < (int) Math.ceil(apiRecipeIds.size() / 200.0); i++) {
+    for (int i = 0; i < (int) Math.ceil(newRecipeIds.size() / 200.0); i++) {
       StringBuilder sb = new StringBuilder();
       sb.append("https://api.guildwars2.com/v2/recipes?ids=");
       int end = Math.min((i + 1) * 200, newRecipeIds.size());
@@ -147,8 +147,12 @@ public class RecipeUpdateService {
     }
   }
 
-
-  // TODO: refactor this
+  /**
+   * Map recipe response to recipe obj
+   *
+   * @param recipeResponse response to map
+   * @return recipe obj
+   */
   private Recipe mapRecipe(RecipePageApiResponse.RecipeResponse recipeResponse) {
     ArrayList<RecipePageApiResponse.RecipeResponse.Ingredient> ingredients = recipeResponse.getIngredients();
     List<RecipeComponent> components = new ArrayList<>();
